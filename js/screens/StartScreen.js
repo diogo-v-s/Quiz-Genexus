@@ -110,9 +110,11 @@ export function render() {
 }
 
 export function mount() {
+  console.log('[mount] StartScreen mount called');
   const form = document.getElementById('configForm');
   const topicList = document.getElementById('topicList');
   const startBtn = document.getElementById('startBtn');
+  console.log('[mount] startBtn found:', !!startBtn);
 
   if (getState().topics.length === 0) {
     loadTopics();
@@ -181,10 +183,13 @@ export function mount() {
   };
 
   const onSubmit = async (e) => {
+    console.log('[onSubmit] clicked');
     const btn = e.target.closest('#startBtn');
+    console.log('[onSubmit] btn found:', !!btn);
     if (!btn) return;
 
     const s = getState();
+    console.log('[onSubmit] selectedTopics:', s.selectedTopics?.length);
     const selected = s.selectedTopics;
 
     if (selected.length === 0) {
@@ -196,13 +201,16 @@ export function mount() {
     const timerEl = document.getElementById('timer');
     const timerDuration = timerEl ? parseInt(timerEl.value) : 0;
     const qty = s.questionCount;
+    console.log('[onSubmit] calling generateQuestions');
     setState({ timerDuration, error: null, generating: true });
 
     try {
       const data = await generateQuestions(selected, qty, diffs);
+      console.log('[onSubmit] questions generated:', data.questions?.length);
       if (!data.questions || data.questions.length === 0) {
         throw new Error('Nenhuma quest\u00E3o foi gerada.');
       }
+      console.log('[onSubmit] setting screen to quiz');
       setState({
         questions: data.questions,
         currentIndex: 0,
@@ -213,6 +221,7 @@ export function mount() {
         generating: false,
       });
     } catch (err) {
+      console.log('[onSubmit] error:', err.message);
       setState({ error: err.message, generating: false });
     }
   };
