@@ -100,7 +100,14 @@ function goTo(newIndex) {
   if (newIndex < 0 || newIndex >= s.questions.length) return;
   setState({ currentIndex: newIndex });
   const content = document.getElementById('content');
-  if (content) content.innerHTML = render();
+  if (content) {
+    try {
+      content.innerHTML = render();
+    } catch (e) {
+      console.error('Erro ao renderizar questao:', e);
+      content.innerHTML = '<p class="error-msg">Erro ao carregar questao. Tente novamente.</p>';
+    }
+  }
   updateTopbar();
 }
 

@@ -2,7 +2,8 @@ export function renderQuestion(q, answer) {
   const letters = ['A', 'B', 'C', 'D'];
   const isMc = q.type === 'multiple_choice';
 
-  const optionsHtml = q.options.map((opt, i) => {
+  const opts = q.options || (isMc ? [] : ['Verdadeiro', 'Falso']);
+  const optionsHtml = opts.map((opt, i) => {
     let cls = 'option';
     const isSelected = answer !== null && answer !== undefined && answer.selected === i;
     if (isSelected) cls += ' selected';
