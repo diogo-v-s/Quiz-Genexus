@@ -56,7 +56,7 @@ export function render() {
     const pct = data.total > 0 ? (data.correct / data.total) * 100 : 0;
     const barColor = pct >= 60 ? 'var(--success)' : pct >= 40 ? '#ca8a04' : 'var(--error)';
     return `
-      <div class="topic-row">
+      <div class="result-topic-row">
         <span class="topic-label">${topic}</span>
         <div class="topic-bar">
           <div class="topic-bar-fill" style="width: ${pct}%; background: ${barColor}"></div>

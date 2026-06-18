@@ -20,16 +20,8 @@ export function render() {
   return `
     <div class="screen ${s.screen === 'start' ? 'active' : ''}" id="startScreen">
       <div class="hero-section">
-        <div class="hero-icon">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            <path d="M8 7h8"/>
-            <path d="M8 11h6"/>
-          </svg>
-        </div>
         <h1>Quiz GeneXus Advanced 18</h1>
-        <p>Teste seus conhecimentos do curso GeneXus Advanced. Selecione os t\u00F3picos e a quantidade de quest\u00F5es para come\u00E7ar.</p>
+        <p>Teste seus conhecimentos. Selecione os t\u00F3picos e a quantidade de quest\u00F5es para come\u00E7ar.</p>
       </div>
 
       ${s.error ? `<div class="error-msg">${s.error}</div>` : ''}
@@ -37,14 +29,14 @@ export function render() {
       <div class="card" id="topicCard">
         <div class="card-header">
           <div>
-            <h3>Escolha os t\u00F3picos</h3>
-            <p>Selecione um ou mais t\u00F3picos para incluir no quiz</p>
+            <h3>T\u00F3picos</h3>
+            <p>Selecione um ou mais t\u00F3picos</p>
           </div>
           <button type="button" id="selectAllBtn">Selecionar todos</button>
         </div>
         <div class="topic-list" id="topicList">
           ${s.topics.length === 0
-            ? '<p style="color:var(--muted);padding:8px 0">Carregando t\u00F3picos...</p>'
+            ? '<p style="color:var(--text-secondary);padding:6px 0;font-size:0.85rem">Carregando t\u00F3picos...</p>'
             : s.topics.map(t => {
                 const icon = TOPIC_ICONS[t] || '\uD83D\uDCDD';
                 const isSelected = s.selectedTopics.includes(t);
@@ -63,8 +55,8 @@ export function render() {
       <div class="card" id="configCard">
         <div class="card-header">
           <div>
-            <h3>Defina a quantidade de quest\u00F5es</h3>
-            <p>Escolha quantas quest\u00F5es por t\u00F3pico deseja responder</p>
+            <h3>Configura\u00E7\u00F5es</h3>
+            <p>Quantidade, dificuldade e tempo limite</p>
           </div>
         </div>
         <div class="qty-control">
@@ -97,10 +89,10 @@ export function render() {
         </div>
       </div>
 
-      <button type="button" class="btn-start" id="startBtn" ${s.generating ? 'disabled' : ''}>
+      <button type="button" class="btn-proceed" id="startBtn" ${s.generating ? 'disabled' : ''}>
         ${s.generating
-          ? '<span class="spinner-ring" style="width:22px;height:22px;border-width:3px"></span> Gerando quest\u00F5es...'
-          : '\uD83D\uDE80 Come\u00E7ar Quiz'
+          ? '<span class="spinner-ring" style="width:20px;height:20px;border-width:2px"></span> Gerando quest\u00F5es...'
+          : 'Come\u00E7ar Quiz'
         }
       </button>
 
@@ -110,7 +102,6 @@ export function render() {
 }
 
 export function mount() {
-  const form = document.getElementById('configForm');
   const topicList = document.getElementById('topicList');
   const startBtn = document.getElementById('startBtn');
 

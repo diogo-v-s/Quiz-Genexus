@@ -3,21 +3,21 @@ import { renderQuestion } from '../components/QuestionCard.js';
 
 export function render() {
   const s = getState();
-  if (!s.questions.length) return '<p>Nenhuma questao disponivel.</p>';
+  if (!s.questions.length) return '<p style="color:var(--text-secondary);padding:24px;text-align:center">Nenhuma questao disponivel.</p>';
 
   const total = s.questions.length;
   const idx = s.currentIndex;
-  const pct = total > 0 ? (idx / total) * 100 : 0;
+  const pct = total > 0 ? ((idx + 1) / total) * 100 : 0;
 
   return `
     <div class="screen active">
+      <div class="progress-header">
+        <span class="count">Questao ${idx + 1} de ${total}</span>
+        ${s.timerDuration > 0 ? `<span id="timerDisplay">${formatTime(s.timeLeft)}</span>` : ''}
+      </div>
       <div class="progress-bar">
         <div class="progress-fill" style="width: ${pct}%"></div>
       </div>
-      <p id="questionCounter">
-        Questao ${idx + 1} de ${total}
-        ${s.timerDuration > 0 ? ` | <span id="timerDisplay">${formatTime(s.timeLeft)}</span>` : ''}
-      </p>
       ${renderQuestion(s.questions[idx], s.answers[idx] ?? null)}
       <div class="nav-buttons">
         <button class="btn btn-outline" id="prevBtn" ${idx === 0 ? 'disabled' : ''}>
