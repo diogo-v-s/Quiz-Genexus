@@ -1,4 +1,4 @@
-import { getState, setState } from '../state.js';
+import { getState, setState, resetState } from '../state.js';
 import { renderQuestion } from '../components/QuestionCard.js';
 
 export function render() {
@@ -24,6 +24,7 @@ export function render() {
           ? `<button class="btn btn-primary" id="nextBtn">Continuar</button>`
           : `<button class="btn btn-success" id="finishBtn">Finalizar Prova</button>`
         }
+        <button class="btn btn-danger" id="cancelBtn">Cancelar</button>
       </div>
     </div>
   `;
@@ -52,6 +53,13 @@ export function mount() {
         return;
       }
       goTo(s.currentIndex + 1);
+      return;
+    }
+
+    if (e.target.id === 'cancelBtn' || e.target.closest('#cancelBtn')) {
+      if (confirm('Tem certeza que deseja cancelar a prova?')) {
+        resetState();
+      }
       return;
     }
 

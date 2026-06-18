@@ -160,6 +160,9 @@ select {
 
 .btn-success { background: var(--success); color: white; }
 
+.btn-danger { background: #e74c3c; color: white; }
+.btn-danger:hover { background: #c0392b; }
+
 /* Question Card */
 #questionCard h3 {
   font-size: 1.125rem;
