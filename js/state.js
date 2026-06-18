@@ -4,6 +4,7 @@ let state = {
   screen: 'start',
   topics: [],
   selectedTopics: [],
+  difficulties: ['easy', 'medium', 'hard'],
   questionCount: 3,
   questions: [],
   currentIndex: 0,
@@ -13,8 +14,8 @@ let state = {
   loading: false,
   error: null,
   generating: false,
-  apiKey: '',
-  aiEnabled: false,
+  timerDuration: 0,
+  timeLeft: 0,
 };
 
 let onChange = null;
@@ -32,6 +33,27 @@ export function setState(partial) {
   state = { ...state, ...partial };
   save();
   if (onChange) onChange(state, prev);
+}
+
+export function saveHistory(result) {
+  try {
+    const history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
+    history.unshift({
+      date: new Date().toISOString(),
+      score: result.score,
+      total: result.total,
+      correct: result.correct,
+      topics: result.byTopic ? Object.keys(result.byTopic) : [],
+    });
+    if (history.length > 5) history.length = 5;
+    localStorage.setItem('quiz_history', JSON.stringify(history));
+  } catch {}
+}
+
+export function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('quiz_history') || '[]');
+  } catch { return []; }
 }
 
 export function resetState() {
@@ -63,9 +85,9 @@ function save() {
       completed: state.completed,
       result: state.result,
       selectedTopics: state.selectedTopics,
+      difficulties: state.difficulties,
       questionCount: state.questionCount,
-      apiKey: state.apiKey,
-      aiEnabled: state.aiEnabled,
+      timerDuration: state.timerDuration,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   } catch {}

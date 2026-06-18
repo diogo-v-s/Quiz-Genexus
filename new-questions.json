@@ -1,0 +1,258 @@
+[
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "easy",
+    "question": "O que define a estrutura de saída (os campos retornados) de um Data Selector?",
+    "options": [
+      "A definição do banco de dados",
+      "A lista de atributos configurada na janela Output do Data Selector",
+      "O comando For Each que o utiliza",
+      "A propriedade Parameters do Data Selector"
+    ],
+    "correct": 1,
+    "explanation": "A estrutura de saída de um Data Selector é definida pelos atributos listados na janela Output, que determina quais campos serão retornados quando o Data Selector for chamado."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "medium",
+    "question": "Como se passam parâmetros para um Data Selector no GeneXus?",
+    "options": [
+      "Através da propriedade Parameters do Data Selector e referenciando-os com &param na condição",
+      "Criando variáveis globais no objeto chamador",
+      "Usando o comando Parm() dentro da definição do Data Selector",
+      "Os Data Selectors não aceitam parâmetros"
+    ],
+    "correct": 0,
+    "explanation": "No Data Selector, define-se a lista de parâmetros na propriedade Parameters. Dentro das condições do Data Selector, esses parâmetros são referenciados com o prefixo & (ex.: &IdCliente) para filtrar dinamicamente os dados."
+  },
+  {
+    "type": "true_false",
+    "topic": "DATA SELECTOR",
+    "difficulty": "medium",
+    "question": "Um Data Selector pode ser utilizado diretamente como fonte de dados em um comando For Each.",
+    "correct": true,
+    "explanation": "Sim, o Data Selector pode ser referenciado em um For Each através da cláusula IN ou USING DATA SELECTOR, permitindo reutilizar a consulta definida no Data Selector dentro do loop."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "hard",
+    "question": "Qual cláusula do Data Selector permite definir a ordenação dos registros retornados?",
+    "options": [
+      "Cláusula WHERE",
+      "Cláusula ORDER (na janela Conditions)",
+      "Propriedade Sort do Data Selector",
+      "A ordenação é definida exclusivamente no objeto que chama o Data Selector"
+    ],
+    "correct": 1,
+    "explanation": "A ordenação no Data Selector é definida através da cláusula ORDER configurada na janela Conditions, onde se especificam os atributos pelos quais os registros serão ordenados."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "medium",
+    "question": "O que a propriedade 'Input' representa na definição de um Data Selector?",
+    "options": [
+      "Os parâmetros de entrada que o Data Selector recebe",
+      "A tabela base (Transaction ou SDT) de onde os dados serão lidos",
+      "O formato de saída esperado (XML, JSON, SDT)",
+      "O nome do arquivo de entrada externo"
+    ],
+    "correct": 1,
+    "explanation": "A propriedade Input do Data Selector define a fonte de dados principal (base de dados ou SDT) sobre a qual a consulta será executada, funcionando como a cláusula FROM de um SELECT."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "hard",
+    "question": "Qual a principal vantagem de um Data Selector sobre uma Query (KB) em termos de reutilização entre diferentes objetos?",
+    "options": [
+      "O Data Selector é mais rápido que a Query",
+      "A Query só pode ser usada em Dashboards, enquanto o Data Selector é mais versátil",
+      "O Data Selector pode ser chamado em For Each, Grids e fórmulas, enquanto a Query tem uso mais restrito a Painéis e Dashboards",
+      "Não há diferença; ambos são intercambiáveis"
+    ],
+    "correct": 2,
+    "explanation": "O Data Selector é mais flexível quanto à reutilização: pode ser usado em comandos For Each, como fonte de dados de Grids em Web Panels, e em fórmulas. Já a Query é tipicamente utilizada em consultas visuais (Dashboards, Painéis Analíticos) com opções limitadas de integração procedural."
+  },
+  {
+    "type": "true_false",
+    "topic": "DATA SELECTOR",
+    "difficulty": "easy",
+    "question": "O Data Selector permite definir condições (filtros WHERE) para restringir quais registros serão retornados.",
+    "correct": true,
+    "explanation": "Sim, na janela Conditions do Data Selector é possível adicionar condições de filtro (WHERE) utilizando operadores como =, >, <, IN, LIKE, entre outros, para selecionar apenas os registros desejados."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "easy",
+    "question": "Em qual dos seguintes contextos NÃO é possível utilizar um Data Selector?",
+    "options": [
+      "Como fonte de dados para um Grid em um Web Panel",
+      "Dentro de um comando For Each",
+      "Em uma fórmula para cálculo de um atributo formulado",
+      "Como evento em um Workflow"
+    ],
+    "correct": 3,
+    "explanation": "O Data Selector não pode ser utilizado como evento de Workflow. Seus usos principais são como fonte para Grids, em comandos For Each e em fórmulas de atributos formulados."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "medium",
+    "question": "O que um Data Selector retorna quando é chamado?",
+    "options": [
+      "Sempre um único valor escalar",
+      "Um SDT (Structured Data Type) preenchido com os dados da consulta",
+      "Uma lista de atributos ou um SDT, dependendo de como é configurado",
+      "Apenas o primeiro registro encontrado"
+    ],
+    "correct": 2,
+    "explanation": "O Data Selector pode retornar uma lista de atributos (quando usado em For Each ou Grid) ou um SDT (quando configurado para tal). O formato exato depende de como o Data Selector é definido e consumido."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA SELECTOR",
+    "difficulty": "hard",
+    "question": "Como é possível reutilizar um mesmo Data Selector em múltiplos objetos sem duplicar sua definição?",
+    "options": [
+      "Copiando o código do Data Selector para cada objeto",
+      "Criando um Data Selector como objeto独立ente e referenciando-o nos objetos consumidores",
+      "Usando herança de Data Selectors",
+      "Não é possível reutilizar; cada objeto deve ter seu próprio Data Selector"
+    ],
+    "correct": 1,
+    "explanation": "O Data Selector é um objeto独立ente na KB (Knowledge Base). Uma vez criado, pode ser referenciado de qualquer objeto (Web Panel, Procedure, etc.) sem necessidade de recriá-lo, promovendo a reutilização e a manutenção centralizada da lógica de consulta."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "easy",
+    "question": "Quais são os grupos obrigatórios na definição de um Data Provider?",
+    "options": [
+      "Input, Process, Output",
+      "Source, Condition, Output",
+      "Output e pelo menos um Source com a estrutura de dados",
+      "Variables, Rules, Conditions"
+    ],
+    "correct": 2,
+    "explanation": "Um Data Provider deve ter obrigatoriamente um grupo Output (que define a estrutura de saída) e pelo menos um grupo Source (que define a fonte de dados). É a combinação dos grupos Source e Output que permite a transformação dos dados."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "medium",
+    "question": "Quando um Data Provider é configurado com saída do tipo SDT (Structured Data Type), como a estrutura de saída é determinada?",
+    "options": [
+      "Pela propriedade 'Return' do Data Provider, que aponta para o SDT de saída",
+      "Pela lista de atributos arrastados para o grupo Output",
+      "Automaticamente, com base no banco de dados",
+      "Pelo grupo Source, que define a estrutura de saída"
+    ],
+    "correct": 0,
+    "explanation": "No Data Provider, quando a saída é um SDT, a propriedade 'Return' deve ser configurada para apontar para o SDT desejado. A estrutura hierárquica do SDT será preenchida conforme a definição dos grupos Output alinhados com os itens do SDT."
+  },
+  {
+    "type": "true_false",
+    "topic": "DATA PROVIDER",
+    "difficulty": "medium",
+    "question": "O Data Provider pode gerar saída diretamente nos formatos XML ou JSON sem a necessidade de transformações externas adicionais.",
+    "correct": true,
+    "explanation": "Sim, o Data Provider suporta nativamente a geração de saída em XML e JSON, bastando configurar a propriedade 'Output Format' para o formato desejado (SDT, XML ou JSON)."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "hard",
+    "question": "Qual é a função do método LoadSequence dentro de um Data Provider?",
+    "options": [
+      "Carregar dados de um arquivo CSV externo",
+      "Carregar uma sequência numérica para uso em cálculos",
+      "Carregar dados em ordem sequencial a partir de uma base de dados SDT ou DB, respeitando a hierarquia pai-filho",
+      "Salvar os dados processados no banco de dados"
+    ],
+    "correct": 2,
+    "explanation": "O comando LoadSequence no Data Provider carrega dados de forma sequencial, respeitando a hierarquia definida. É especialmente útil para carregar dados de SDTs ou do banco em estruturas aninhadas, garantindo que os dados sejam carregados na ordem correta (pai antes dos filhos)."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "medium",
+    "question": "Para que serve o grupo 'Source' dentro de um Data Provider?",
+    "options": [
+      "Define o destino onde os dados serão persistidos",
+      "Define a fonte de dados (tabela, view ou SDT) da qual os dados serão lidos",
+      "Define a formatação da saída (XML ou JSON)",
+      "Define as permissões de acesso aos dados"
+    ],
+    "correct": 1,
+    "explanation": "O grupo Source no Data Provider especifica de onde os dados serão obtidos — pode ser uma Transaction, uma tabela do banco, uma view ou até mesmo um SDT previamente preenchido. É a origem dos dados que alimentam a transformação."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "hard",
+    "question": "Qual a principal diferença entre um Data Provider e uma Procedure no GeneXus em termos de manipulação e transformação de dados?",
+    "options": [
+      "Data Provider é procedural e Procedure é declarativa",
+      "Data Provider é declarativo (baseado em grupos) e Procedure é procedural (baseado em comandos sequenciais)",
+      "Não há diferença; ambos funcionam da mesma forma",
+      "Procedure só funciona com dados de banco, enquanto Data Provider aceita qualquer fonte"
+    ],
+    "correct": 1,
+    "explanation": "O Data Provider adota uma abordagem declarativa: define-se a estrutura de saída e as fontes de dados em grupos, e o GeneXus otimiza automaticamente a execução. Já a Procedure segue o paradigma procedural, onde o desenvolvedor escreve comandos sequenciais (For Each, Do While, etc.) controlando manualmente o fluxo."
+  },
+  {
+    "type": "true_false",
+    "topic": "DATA PROVIDER",
+    "difficulty": "easy",
+    "question": "O método Save() em um Data Provider só funciona quando a saída é um SDT baseado em uma Transaction.",
+    "correct": true,
+    "explanation": "Sim, o método Save() persiste os dados no banco apenas quando o SDT de saída está associado a uma Transaction (ou seja, quando o SDT segue a estrutura de uma tabela do banco). Caso contrário, não há para qual tabela salvar."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "medium",
+    "question": "Como um Data Provider combina dados de múltiplas fontes (tabelas diferentes) em uma única estrutura de saída?",
+    "options": [
+      "Usando JOIN explícito no grupo Source",
+      "Definindo múltiplos grupos Source no mesmo nível do Output e associando-os por condições",
+      "Usando Procedures auxiliares dentro do Data Provider",
+      "Não é possível combinar múltiplas fontes em um único Data Provider"
+    ],
+    "correct": 1,
+    "explanation": "No Data Provider, é possível definir múltiplos grupos Source, cada um apontando para uma tabela diferente. Através de condições (WHERE) que relacionam as fontes, o Data Provider combina os dados em uma única saída hierárquica ou plana."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "easy",
+    "question": "Qual propriedade do Data Provider define o formato de saída dos dados transformados?",
+    "options": [
+      "Output Type",
+      "Generate",
+      "Output Format",
+      "Return Type"
+    ],
+    "correct": 2,
+    "explanation": "A propriedade 'Output Format' do Data Provider define se a saída será gerada como SDT, XML ou JSON. Essa propriedade determina como o resultado da transformação será serializado ao final da execução."
+  },
+  {
+    "type": "multiple_choice",
+    "topic": "DATA PROVIDER",
+    "difficulty": "hard",
+    "question": "Em um Data Provider com estrutura hierárquica (pai-filho), como se define corretamente o nível filho dentro do grupo pai?",
+    "options": [
+      "Criando um grupo Output filho aninhado dentro do grupo Output pai, alinhado ao item correspondente do SDT",
+      "Usando o comando LoadSequence entre pai e filho",
+      "Criando dois Data Providers separados e mesclando o resultado",
+      "Definindo uma condição no grupo pai que referencia o filho"
+    ],
+    "correct": 0,
+    "explanation": "Para criar hierarquia no Data Provider, aninha-se um grupo Output filho dentro do grupo Output pai, alinhando cada grupo ao respectivo item do SDT. O grupo pai carrega os registros do nível superior, e o grupo filho (aninhado) carrega os registros subordinados para cada registro pai."
+  }
+]

@@ -1,4 +1,4 @@
-import { getState, setState } from '../state.js';
+import { getState, setState, getHistory } from '../state.js';
 import { fetchTopics, generateQuestions } from '../api.js';
 
 export function render() {
@@ -35,16 +35,34 @@ export function render() {
               <option value="5" ${s.questionCount === 5 ? 'selected' : ''}>5 questoes</option>
             </select>
           </div>
-          <div class="ai-section">
-            <label class="ai-toggle">
-              <input type="checkbox" id="aiToggle" ${s.aiEnabled ? 'checked' : ''}>
-              <span>Usar IA para gerar questoes</span>
-            </label>
-            <div class="ai-key-input" id="aiKeyWrap" style="${s.aiEnabled ? '' : 'display:none'}">
-              <input type="password" id="apiKeyInput" class="input" placeholder="Chave da API OpenRouter (sk-or-...)" value="${s.apiKey}">
-              <a href="https://openrouter.ai/keys" target="_blank" class="ai-help">Obter chave gratuita</a>
+          <div class="form-group">
+            <label for="timer">Tempo limite:</label>
+            <select id="timer" ${s.generating ? 'disabled' : ''}>
+              <option value="0" ${s.timerDuration === 0 ? 'selected' : ''}>Sem limite</option>
+              <option value="300" ${s.timerDuration === 300 ? 'selected' : ''}>5 minutos</option>
+              <option value="600" ${s.timerDuration === 600 ? 'selected' : ''}>10 minutos</option>
+              <option value="900" ${s.timerDuration === 900 ? 'selected' : ''}>15 minutos</option>
+              <option value="1200" ${s.timerDuration === 1200 ? 'selected' : ''}>20 minutos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Dificuldade:</label>
+            <div class="diff-checkboxes">
+              <label class="diff-checkbox">
+                <input type="checkbox" class="diff-input" value="easy" ${s.difficulties.includes('easy') ? 'checked' : ''}>
+                <span>Facil</span>
+              </label>
+              <label class="diff-checkbox">
+                <input type="checkbox" class="diff-input" value="medium" ${s.difficulties.includes('medium') ? 'checked' : ''}>
+                <span>Medio</span>
+              </label>
+              <label class="diff-checkbox">
+                <input type="checkbox" class="diff-input" value="hard" ${s.difficulties.includes('hard') ? 'checked' : ''}>
+                <span>Dificil</span>
+              </label>
             </div>
           </div>
+
           <button type="submit" class="btn btn-primary" id="startBtn" ${s.generating ? 'disabled' : ''}>
             ${s.generating
               ? '<span class="spinner-ring" style="width:20px;height:20px;border-width:3px"></span> Gerando questoes...'
@@ -53,6 +71,7 @@ export function render() {
           </button>
         </form>
       </div>
+      ${renderHistory()}
     </div>
   `;
 }
@@ -91,17 +110,21 @@ export function mount() {
       return;
     }
 
-    const aiEnabled = document.getElementById('aiToggle').checked;
-    const apiKey = document.getElementById('apiKeyInput').value;
-    setState({ selectedTopics: selected, questionCount: parseInt(document.getElementById('qty').value), apiKey, aiEnabled, error: null, generating: true });
+    const checkedDiff = Array.from(document.querySelectorAll('.diff-input:checked')).map(cb => cb.value);
+    if (checkedDiff.length === 0) {
+      setState({ error: 'Selecione pelo menos uma dificuldade.' });
+      return;
+    }
+    const timerDuration = parseInt(document.getElementById('timer').value);
+    setState({ selectedTopics: selected, difficulties: checkedDiff, questionCount: parseInt(document.getElementById('qty').value), timerDuration, error: null, generating: true });
 
     try {
-      const data = await generateQuestions(selected, parseInt(document.getElementById('qty').value));
+      const data = await generateQuestions(selected, parseInt(document.getElementById('qty').value), checkedDiff);
       if (!data.questions || data.questions.length === 0) {
         throw new Error('Nenhuma questao foi gerada. Verifique se o servidor esta rodando.');
       }
       setState({
-        questions: shuffle(data.questions),
+        questions: data.questions,
         currentIndex: 0,
         answers: [],
         completed: false,
@@ -114,40 +137,30 @@ export function mount() {
     }
   };
 
-  const aiToggle = document.getElementById('aiToggle');
-  const apiKeyInput = document.getElementById('apiKeyInput');
-  const aiKeyWrap = document.getElementById('aiKeyWrap');
-
-  const onAiToggle = () => {
-    const enabled = aiToggle.checked;
-    aiKeyWrap.style.display = enabled ? '' : 'none';
-    setState({ aiEnabled: enabled, error: null });
-  };
-
-  const onApiKeyInput = () => {
-    setState({ apiKey: apiKeyInput.value, error: null });
-  };
-
   document.addEventListener('click', onPillClick);
-  aiToggle?.addEventListener('change', onAiToggle);
-  apiKeyInput?.addEventListener('input', onApiKeyInput);
   form?.addEventListener('submit', onSubmit);
 
   return () => {
     document.removeEventListener('click', onPillClick);
-    aiToggle?.removeEventListener('change', onAiToggle);
-    apiKeyInput?.removeEventListener('input', onApiKeyInput);
     form?.removeEventListener('submit', onSubmit);
   };
 }
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+function renderHistory() {
+  const history = getHistory();
+  if (history.length === 0) return '';
+  return `
+    <div class="card">
+      <h3 style="margin-bottom:12px;font-size:1rem">Ultimos resultados</h3>
+      ${history.map(h => `
+        <div class="history-row">
+          <span class="history-date">${new Date(h.date).toLocaleDateString('pt-BR')}</span>
+          <span class="history-score ${h.score >= 60 ? 'text-correct' : 'text-wrong'}">${h.score}%</span>
+          <span class="history-detail">${h.correct}/${h.total}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 async function loadTopics() {

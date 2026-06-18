@@ -1,4 +1,4 @@
-import { getState, setState, resetState } from '../state.js';
+import { getState, setState, resetState, saveHistory } from '../state.js';
 import { renderQuestion } from '../components/QuestionCard.js';
 
 export function render() {
@@ -14,7 +14,10 @@ export function render() {
       <div class="progress-bar">
         <div class="progress-fill" style="width: ${pct}%"></div>
       </div>
-      <p id="questionCounter">Questao ${idx + 1} de ${total}</p>
+      <p id="questionCounter">
+        Questao ${idx + 1} de ${total}
+        ${s.timerDuration > 0 ? ` | <span id="timerDisplay">${formatTime(s.timeLeft)}</span>` : ''}
+      </p>
       ${renderQuestion(s.questions[idx], s.answers[idx] ?? null)}
       <div class="nav-buttons">
         <button class="btn btn-outline" id="prevBtn" ${idx === 0 ? 'disabled' : ''}>
@@ -30,8 +33,34 @@ export function render() {
   `;
 }
 
+let timerInterval = null;
+
 export function mount() {
   const content = document.getElementById('content');
+
+  const s = getState();
+  if (s.timerDuration > 0 && s.timeLeft <= 0) {
+    setState({ timeLeft: s.timerDuration });
+  }
+
+  if (s.timerDuration > 0 && !timerInterval) {
+    timerInterval = setInterval(() => {
+      const cur = getState();
+      if (cur.timeLeft <= 1) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        setState({ timeLeft: 0 });
+        finishQuiz();
+        return;
+      }
+      setState({ timeLeft: cur.timeLeft - 1 });
+      const td = document.getElementById('timerDisplay');
+      if (td) {
+        td.textContent = formatTime(cur.timeLeft - 1);
+        td.className = cur.timeLeft <= 60 ? 'danger' : cur.timeLeft <= 180 ? 'warning' : '';
+      }
+    }, 1000);
+  }
 
   const handler = (e) => {
     const s = getState();
@@ -73,11 +102,68 @@ export function mount() {
     }
   };
 
+  const keyHandler = (e) => {
+    const s = getState();
+
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+    const q = s.questions[s.currentIndex];
+    const isLast = s.currentIndex >= s.questions.length - 1;
+
+    if (e.key >= '1' && e.key <= '4') {
+      const idx = parseInt(e.key) - 1;
+      if ((q.type === 'multiple_choice' && idx < (q.options ? q.options.length : 4)) ||
+          (q.type !== 'multiple_choice' && idx < 2)) {
+        selectAnswer(idx);
+      }
+      return;
+    }
+
+    if (e.key === 'v' || e.key === 'V') { selectAnswer(0); return; }
+    if (e.key === 'f' || e.key === 'F') { selectAnswer(1); return; }
+
+    if (e.key === 'Enter') {
+      if (s.answers[s.currentIndex] == null) {
+        alert('Selecione uma resposta antes de continuar.');
+        return;
+      }
+      if (isLast) {
+        try { finishQuiz(); } catch (ex) { alert('Erro: ' + ex.message); }
+      } else {
+        goTo(s.currentIndex + 1);
+      }
+      return;
+    }
+
+    if (e.key === 'ArrowLeft') { goTo(s.currentIndex - 1); return; }
+    if (e.key === 'ArrowRight') {
+      if (s.answers[s.currentIndex] == null) return;
+      goTo(s.currentIndex + 1);
+      return;
+    }
+    if (e.key === 'Escape') {
+      if (confirm('Tem certeza que deseja cancelar a prova?')) resetState();
+      return;
+    }
+  };
+
   document.addEventListener('click', handler);
+  document.addEventListener('keydown', keyHandler);
 
   return () => {
     document.removeEventListener('click', handler);
+    document.removeEventListener('keydown', keyHandler);
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
   };
+}
+
+function formatTime(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
 }
 
 function selectAnswer(selectedIndex) {
@@ -153,6 +239,8 @@ function finishQuiz() {
     if (s.answers[i]?.isCorrect) byTopic[t].correct++;
   }
 
-  setState({ completed: true, result: { total, correct, score, byTopic } });
+  const result = { total, correct, score, byTopic };
+  saveHistory(result);
+  setState({ completed: true, result });
   setState({ screen: 'result' });
 }
