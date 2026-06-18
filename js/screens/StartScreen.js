@@ -180,7 +180,10 @@ export function mount() {
     });
   };
 
-  const onSubmit = async () => {
+  const onSubmit = async (e) => {
+    const btn = e.target.closest('#startBtn');
+    if (!btn) return;
+
     const s = getState();
     const selected = s.selectedTopics;
 
@@ -219,7 +222,7 @@ export function mount() {
   document.getElementById('qtyDec')?.addEventListener('click', () => onQtyChange(-1));
   document.getElementById('qtyInc')?.addEventListener('click', () => onQtyChange(1));
   document.addEventListener('click', onDiffClick);
-  startBtn?.addEventListener('click', onSubmit);
+  document.addEventListener('click', onSubmit);
 
   return () => {
     document.removeEventListener('click', onTopicClick);
@@ -227,7 +230,7 @@ export function mount() {
     document.getElementById('selectAllBtn')?.removeEventListener('click', onSelectAll);
     document.getElementById('qtyDec')?.removeEventListener('click', () => onQtyChange(-1));
     document.getElementById('qtyInc')?.removeEventListener('click', () => onQtyChange(1));
-    startBtn?.removeEventListener('click', onSubmit);
+    document.removeEventListener('click', onSubmit);
   };
 }
 
