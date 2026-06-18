@@ -128,15 +128,15 @@ export function mount() {
     setState({ apiKey: apiKeyInput.value, error: null });
   };
 
+  document.addEventListener('click', onPillClick);
   aiToggle?.addEventListener('change', onAiToggle);
   apiKeyInput?.addEventListener('input', onApiKeyInput);
-  topicList?.addEventListener('click', onPillClick);
   form?.addEventListener('submit', onSubmit);
 
   return () => {
+    document.removeEventListener('click', onPillClick);
     aiToggle?.removeEventListener('change', onAiToggle);
     apiKeyInput?.removeEventListener('input', onApiKeyInput);
-    topicList?.removeEventListener('click', onPillClick);
     form?.removeEventListener('submit', onSubmit);
   };
 }
