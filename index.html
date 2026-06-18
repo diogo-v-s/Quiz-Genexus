@@ -9,8 +9,19 @@
 <body>
   <div id="app">
     <nav id="topbar">
-      <h1>Quiz GeneXus Advanced</h1>
-      <span id="progress-indicator"></span>
+      <div class="topbar-left">
+        <span class="topbar-logo">QG</span>
+        <span class="topbar-title">Quiz GeneXus Advanced</span>
+      </div>
+      <div class="topbar-right">
+        <span id="progress-indicator"></span>
+        <div class="topbar-avatar" title="Usuario" aria-label="Avatar do usuario">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4"/>
+            <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+        </div>
+      </div>
     </nav>
     <main id="content"></main>
   </div>

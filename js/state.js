@@ -62,6 +62,7 @@ export function resetState() {
     screen: 'start',
     topics: state.topics,
     selectedTopics: state.selectedTopics,
+    difficulties: state.difficulties,
     questionCount: 3,
     questions: [],
     currentIndex: 0,
@@ -71,6 +72,8 @@ export function resetState() {
     loading: false,
     error: null,
     generating: false,
+    timerDuration: state.timerDuration,
+    timeLeft: 0,
   };
   localStorage.removeItem(STORAGE_KEY);
   if (onChange) onChange(state, prev);

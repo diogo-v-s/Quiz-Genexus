@@ -1,76 +1,109 @@
 import { getState, setState, getHistory } from '../state.js';
 import { fetchTopics, generateQuestions } from '../api.js';
 
+const TOPIC_ICONS = {
+  "TRANSACTIONS & RULES": "\uD83D\uDCC4",
+  "FORMULAS": "\uD83E\uDDEE",
+  "DYNAMIC TRANSACTIONS & EVENTS": "\u26A1",
+  "PROCEDURES (FOR EACH, SUBROUTINES, UNIQUE)": "\u2699\uFE0F",
+  "DATA SELECTOR": "\uD83D\uDCC4",
+  "DATA PROVIDER": "\u2601\uFE0F",
+  "BUSINESS COMPONENTS": "\uD83E\uDDE9",
+  "DATABASE UPDATES (NEW, FOR EACH, DELETE)": "\uD83D\uDCBE",
+  "TRANSACTIONAL INTEGRITY (LUW)": "\uD83D\uDD17",
+  "WEB PANELS & UI EVENTS": "\uD83D\uDDA5\uFE0F",
+  "ACCESS TO EXTERNAL DATA": "\uD83C\uDF10",
+};
+
 export function render() {
   const s = getState();
   return `
     <div class="screen ${s.screen === 'start' ? 'active' : ''}" id="startScreen">
-      <div class="card">
-        <h2>Quiz GeneXus Advanced 18</h2>
-        <p>Teste seus conhecimentos do curso GeneXus Advanced. Selecione os topicos e a quantidade de questoes para comecar.</p>
+      <div class="hero-section">
+        <div class="hero-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            <path d="M8 7h8"/>
+            <path d="M8 11h6"/>
+          </svg>
+        </div>
+        <h1>Quiz GeneXus Advanced 18</h1>
+        <p>Teste seus conhecimentos do curso GeneXus Advanced. Selecione os t\u00F3picos e a quantidade de quest\u00F5es para come\u00E7ar.</p>
       </div>
+
       ${s.error ? `<div class="error-msg">${s.error}</div>` : ''}
-      <div class="card">
-        <form id="configForm">
-          <div class="form-group">
-            <label>Topicos para incluir no quiz:</label>
-            <div class="topic-list" id="topicList">
-              ${s.topics.length === 0
-                ? '<p style="color:var(--muted)">Carregando topicos...</p>'
-                : s.topics.map(t => `
-                  <button type="button" class="topic-pill${s.selectedTopics.includes(t) ? ' selected' : ''}" data-topic="${t}" ${s.generating ? 'disabled' : ''}>
-                    <span class="pill-radio"></span>
-                    <span class="pill-label">${t}</span>
-                  </button>
-                `).join('')
-              }
+
+      <div class="card" id="topicCard">
+        <div class="card-header">
+          <div>
+            <h3>Escolha os t\u00F3picos</h3>
+            <p>Selecione um ou mais t\u00F3picos para incluir no quiz</p>
+          </div>
+          <button type="button" id="selectAllBtn">Selecionar todos</button>
+        </div>
+        <div class="topic-list" id="topicList">
+          ${s.topics.length === 0
+            ? '<p style="color:var(--muted);padding:8px 0">Carregando t\u00F3picos...</p>'
+            : s.topics.map(t => {
+                const icon = TOPIC_ICONS[t] || '\uD83D\uDCDD';
+                const isSelected = s.selectedTopics.includes(t);
+                return `
+                  <div class="topic-row${isSelected ? ' selected' : ''}" data-topic="${t}" ${s.generating ? 'disabled' : ''}>
+                    <span class="topic-icon">${icon}</span>
+                    <span class="topic-name">${t}</span>
+                    <span class="topic-check">${isSelected ? '\u2713' : ''}</span>
+                  </div>
+                `;
+              }).join('')
+          }
+        </div>
+      </div>
+
+      <div class="card" id="configCard">
+        <div class="card-header">
+          <div>
+            <h3>Defina a quantidade de quest\u00F5es</h3>
+            <p>Escolha quantas quest\u00F5es por t\u00F3pico deseja responder</p>
+          </div>
+        </div>
+        <div class="qty-control">
+          <button type="button" class="qty-btn" id="qtyDec" ${s.questionCount <= 1 || s.generating ? 'disabled' : ''}>\u2212</button>
+          <span class="qty-value" id="qtyDisplay">${s.questionCount}</span>
+          <button type="button" class="qty-btn" id="qtyInc" ${s.questionCount >= 15 || s.generating ? 'disabled' : ''}>+</button>
+        </div>
+        <div class="extra-row">
+          <div class="option-group">
+            <label>Dificuldade</label>
+            <div class="diff-pills">
+              ${['easy', 'medium', 'hard'].map(d => {
+                const diffs = s.difficulties || [];
+                return `<span class="diff-pill${diffs.includes(d) ? ' selected' : ''}" data-diff="${d}">${
+                  d === 'easy' ? 'F\u00E1cil' : d === 'medium' ? 'M\u00E9dio' : 'Dif\u00EDcil'
+                }</span>`;
+              }).join('')}
             </div>
           </div>
-          <div class="form-group">
-            <label for="qty">Quantidade de questoes por topico:</label>
-            <select id="qty" ${s.generating ? 'disabled' : ''}>
-              <option value="2" ${s.questionCount === 2 ? 'selected' : ''}>2 questoes</option>
-              <option value="3" ${s.questionCount === 3 ? 'selected' : ''}>3 questoes</option>
-              <option value="4" ${s.questionCount === 4 ? 'selected' : ''}>4 questoes</option>
-              <option value="5" ${s.questionCount === 5 ? 'selected' : ''}>5 questoes</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="timer">Tempo limite:</label>
-            <select id="timer" ${s.generating ? 'disabled' : ''}>
-              <option value="0" ${s.timerDuration === 0 ? 'selected' : ''}>Sem limite</option>
+          <div class="option-group">
+            <label for="timer">Tempo limite</label>
+            <select id="timer" class="timer-select" ${s.generating ? 'disabled' : ''}>
+              <option value="0" ${(s.timerDuration || 0) === 0 ? 'selected' : ''}>Sem limite</option>
               <option value="300" ${s.timerDuration === 300 ? 'selected' : ''}>5 minutos</option>
               <option value="600" ${s.timerDuration === 600 ? 'selected' : ''}>10 minutos</option>
               <option value="900" ${s.timerDuration === 900 ? 'selected' : ''}>15 minutos</option>
               <option value="1200" ${s.timerDuration === 1200 ? 'selected' : ''}>20 minutos</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Dificuldade:</label>
-            <div class="diff-checkboxes">
-              <label class="diff-checkbox">
-                <input type="checkbox" class="diff-input" value="easy" ${s.difficulties.includes('easy') ? 'checked' : ''}>
-                <span>Facil</span>
-              </label>
-              <label class="diff-checkbox">
-                <input type="checkbox" class="diff-input" value="medium" ${s.difficulties.includes('medium') ? 'checked' : ''}>
-                <span>Medio</span>
-              </label>
-              <label class="diff-checkbox">
-                <input type="checkbox" class="diff-input" value="hard" ${s.difficulties.includes('hard') ? 'checked' : ''}>
-                <span>Dificil</span>
-              </label>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary" id="startBtn" ${s.generating ? 'disabled' : ''}>
-            ${s.generating
-              ? '<span class="spinner-ring" style="width:20px;height:20px;border-width:3px"></span> Gerando questoes...'
-              : 'Gerar Prova'
-            }
-          </button>
-        </form>
+        </div>
       </div>
+
+      <button type="button" class="btn-start" id="startBtn" ${s.generating ? 'disabled' : ''}>
+        ${s.generating
+          ? '<span class="spinner-ring" style="width:22px;height:22px;border-width:3px"></span> Gerando quest\u00F5es...'
+          : '\uD83D\uDE80 Come\u00E7ar Quiz'
+        }
+      </button>
+
       ${renderHistory()}
     </div>
   `;
@@ -79,49 +112,93 @@ export function render() {
 export function mount() {
   const form = document.getElementById('configForm');
   const topicList = document.getElementById('topicList');
+  const startBtn = document.getElementById('startBtn');
 
   if (getState().topics.length === 0) {
     loadTopics();
   }
 
-  const onPillClick = (e) => {
-    const pill = e.target.closest('.topic-pill');
-    if (!pill) return;
+  const onTopicClick = (e) => {
+    const row = e.target.closest('.topic-row');
+    if (!row || row.hasAttribute('disabled')) return;
     const s = getState();
     let selected = [...s.selectedTopics];
-    const topic = pill.dataset.topic;
+    const topic = row.dataset.topic;
     if (selected.includes(topic)) {
       selected = selected.filter(t => t !== topic);
     } else {
       selected.push(topic);
     }
     setState({ selectedTopics: selected, error: null });
-    document.querySelectorAll('.topic-pill').forEach(p => {
-      p.classList.toggle('selected', selected.includes(p.dataset.topic));
+    document.querySelectorAll('.topic-row').forEach(r => {
+      const isSel = selected.includes(r.dataset.topic);
+      r.classList.toggle('selected', isSel);
+      r.querySelector('.topic-check').textContent = isSel ? '\u2713' : '';
     });
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const selected = Array.from(document.querySelectorAll('.topic-pill.selected')).map(p => p.dataset.topic);
+  const onSelectAll = () => {
+    const s = getState();
+    const allSelected = s.topics.every(t => s.selectedTopics.includes(t));
+    const selected = allSelected ? [] : [...s.topics];
+    setState({ selectedTopics: selected, error: null });
+    document.querySelectorAll('.topic-row').forEach(r => {
+      const isSel = selected.includes(r.dataset.topic);
+      r.classList.toggle('selected', isSel);
+      r.querySelector('.topic-check').textContent = isSel ? '\u2713' : '';
+    });
+  };
+
+  const onQtyChange = (delta) => {
+    const s = getState();
+    const newVal = Math.max(1, Math.min(15, s.questionCount + delta));
+    if (newVal === s.questionCount) return;
+    setState({ questionCount: newVal });
+    const display = document.getElementById('qtyDisplay');
+    if (display) display.textContent = newVal;
+    const decBtn = document.getElementById('qtyDec');
+    const incBtn = document.getElementById('qtyInc');
+    if (decBtn) decBtn.disabled = newVal <= 1;
+    if (incBtn) incBtn.disabled = newVal >= 15;
+  };
+
+  const onDiffClick = (e) => {
+    const pill = e.target.closest('.diff-pill');
+    if (!pill) return;
+    const val = pill.dataset.diff;
+    const s = getState();
+    let diffs = [...s.difficulties];
+    if (diffs.includes(val)) {
+      diffs = diffs.filter(d => d !== val);
+    } else {
+      diffs.push(val);
+    }
+    if (diffs.length === 0) return;
+    setState({ difficulties: diffs });
+    document.querySelectorAll('.diff-pill').forEach(p => {
+      p.classList.toggle('selected', diffs.includes(p.dataset.diff));
+    });
+  };
+
+  const onSubmit = async () => {
+    const s = getState();
+    const selected = s.selectedTopics;
 
     if (selected.length === 0) {
-      setState({ error: 'Selecione pelo menos um topico.' });
+      setState({ error: 'Selecione pelo menos um t\u00F3pico.' });
       return;
     }
 
-    const checkedDiff = Array.from(document.querySelectorAll('.diff-input:checked')).map(cb => cb.value);
-    if (checkedDiff.length === 0) {
-      setState({ error: 'Selecione pelo menos uma dificuldade.' });
-      return;
-    }
-    const timerDuration = parseInt(document.getElementById('timer').value);
-    setState({ selectedTopics: selected, difficulties: checkedDiff, questionCount: parseInt(document.getElementById('qty').value), timerDuration, error: null, generating: true });
+    const diffs = s.difficulties || ['easy', 'medium', 'hard'];
+    const timerEl = document.getElementById('timer');
+    const timerDuration = timerEl ? parseInt(timerEl.value) : 0;
+    const qty = s.questionCount;
+    setState({ timerDuration, error: null, generating: true });
 
     try {
-      const data = await generateQuestions(selected, parseInt(document.getElementById('qty').value), checkedDiff);
+      const data = await generateQuestions(selected, qty, diffs);
       if (!data.questions || data.questions.length === 0) {
-        throw new Error('Nenhuma questao foi gerada. Verifique se o servidor esta rodando.');
+        throw new Error('Nenhuma quest\u00E3o foi gerada.');
       }
       setState({
         questions: data.questions,
@@ -137,12 +214,20 @@ export function mount() {
     }
   };
 
-  document.addEventListener('click', onPillClick);
-  form?.addEventListener('submit', onSubmit);
+  document.addEventListener('click', onTopicClick);
+  document.getElementById('selectAllBtn')?.addEventListener('click', onSelectAll);
+  document.getElementById('qtyDec')?.addEventListener('click', () => onQtyChange(-1));
+  document.getElementById('qtyInc')?.addEventListener('click', () => onQtyChange(1));
+  document.addEventListener('click', onDiffClick);
+  startBtn?.addEventListener('click', onSubmit);
 
   return () => {
-    document.removeEventListener('click', onPillClick);
-    form?.removeEventListener('submit', onSubmit);
+    document.removeEventListener('click', onTopicClick);
+    document.removeEventListener('click', onDiffClick);
+    document.getElementById('selectAllBtn')?.removeEventListener('click', onSelectAll);
+    document.getElementById('qtyDec')?.removeEventListener('click', () => onQtyChange(-1));
+    document.getElementById('qtyInc')?.removeEventListener('click', () => onQtyChange(1));
+    startBtn?.removeEventListener('click', onSubmit);
   };
 }
 
@@ -150,8 +235,13 @@ function renderHistory() {
   const history = getHistory();
   if (history.length === 0) return '';
   return `
-    <div class="card">
-      <h3 style="margin-bottom:12px;font-size:1rem">Ultimos resultados</h3>
+    <div class="card" style="margin-top:8px">
+      <div class="card-header">
+        <div>
+          <h3>\u00DAltimos resultados</h3>
+          <p>Seus \u00FAltimos quizzes realizados</p>
+        </div>
+      </div>
       ${history.map(h => `
         <div class="history-row">
           <span class="history-date">${new Date(h.date).toLocaleDateString('pt-BR')}</span>
@@ -170,15 +260,20 @@ async function loadTopics() {
     const preSelected = data.topics.slice(0, 3);
     setState({ topics: data.topics, selectedTopics: preSelected, error: null });
     if (topicList) {
-      topicList.innerHTML = data.topics.map(t => `
-        <button type="button" class="topic-pill${preSelected.includes(t) ? ' selected' : ''}" data-topic="${t}" ${getState().generating ? 'disabled' : ''}>
-          <span class="pill-radio"></span>
-          <span class="pill-label">${t}</span>
-        </button>
-      `).join('');
+      topicList.innerHTML = data.topics.map(t => {
+        const icon = TOPIC_ICONS[t] || '\uD83D\uDCDD';
+        const sel = preSelected.includes(t);
+        return `
+          <div class="topic-row${sel ? ' selected' : ''}" data-topic="${t}">
+            <span class="topic-icon">${icon}</span>
+            <span class="topic-name">${t}</span>
+            <span class="topic-check">${sel ? '\u2713' : ''}</span>
+          </div>
+        `;
+      }).join('');
     }
   } catch (err) {
-    setState({ error: 'Nao foi possivel carregar topicos. O servidor esta rodando? (http://localhost:3000)' });
+    setState({ error: 'N\u00E3o foi poss\u00EDvel carregar t\u00F3picos.' });
     if (topicList) {
       topicList.innerHTML = '<p style="color:var(--error)">Erro ao carregar. Verifique o servidor.</p>';
     }
