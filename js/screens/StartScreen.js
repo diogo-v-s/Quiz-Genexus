@@ -67,10 +67,17 @@ export function mount() {
 
   const onPillClick = (e) => {
     const pill = e.target.closest('.topic-pill');
-    if (!pill || pill.classList.contains('selected')) return;
-    document.querySelectorAll('.topic-pill.selected').forEach(p => p.classList.remove('selected'));
-    pill.classList.add('selected');
-    setState({ selectedTopics: [pill.dataset.topic], error: null });
+    if (!pill) return;
+    const s = getState();
+    let selected = [...s.selectedTopics];
+    const topic = pill.dataset.topic;
+    if (selected.includes(topic)) {
+      selected = selected.filter(t => t !== topic);
+    } else {
+      selected.push(topic);
+    }
+    pill.classList.toggle('selected');
+    setState({ selectedTopics: selected, error: null });
   };
 
   const onSubmit = async (e) => {
@@ -145,10 +152,11 @@ async function loadTopics() {
   const topicList = document.getElementById('topicList');
   try {
     const data = await fetchTopics();
-    setState({ topics: data.topics, selectedTopics: [data.topics[0]], error: null });
+    const preSelected = data.topics.slice(0, 3);
+    setState({ topics: data.topics, selectedTopics: preSelected, error: null });
     if (topicList) {
-      topicList.innerHTML = data.topics.map((t, i) => `
-        <button type="button" class="topic-pill${i === 0 ? ' selected' : ''}" data-topic="${t}" ${getState().generating ? 'disabled' : ''}>
+      topicList.innerHTML = data.topics.map(t => `
+        <button type="button" class="topic-pill${preSelected.includes(t) ? ' selected' : ''}" data-topic="${t}" ${getState().generating ? 'disabled' : ''}>
           <span class="pill-radio"></span>
           <span class="pill-label">${t}</span>
         </button>

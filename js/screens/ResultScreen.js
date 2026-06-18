@@ -93,6 +93,7 @@ export function render() {
         <div class="result-actions">
           <button class="btn btn-primary" id="viewReviewBtn">Visualizar Questoes</button>
           <button class="btn btn-outline" id="restartBtn">Refazer Prova</button>
+          <button class="btn btn-outline" id="homeBtn">Voltar ao Inicio</button>
         </div>
       </div>
 
@@ -120,6 +121,10 @@ export function mount() {
   });
 
   document.getElementById('restartBtn')?.addEventListener('click', () => {
+    resetState();
+  });
+
+  document.getElementById('homeBtn')?.addEventListener('click', () => {
     resetState();
   });
 
