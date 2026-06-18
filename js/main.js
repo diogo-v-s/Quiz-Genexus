@@ -42,7 +42,6 @@ function updateTopbar(s) {
 }
 
 function handleStateChange(newState, prevState) {
-  console.log('[stateChange] screen:', prevState.screen, '->', newState.screen, 'questions:', newState.questions?.length);
   if (newState.screen !== prevState.screen) {
     navigate(newState.screen);
   } else if (newState.screen === 'quiz') {
