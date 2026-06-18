@@ -90,6 +90,12 @@ function selectAnswer(selectedIndex) {
   };
 
   setState({ answers: newAnswers });
+
+  // Direct DOM update - no re-render
+  const options = document.querySelectorAll('.option');
+  options.forEach((opt, i) => {
+    opt.classList.toggle('selected', i === selectedIndex);
+  });
 }
 
 function finishQuiz() {

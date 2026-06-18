@@ -65,28 +65,63 @@ body {
 .form-group label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
 
 .topic-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 8px;
-  max-height: 300px;
+  max-height: 360px;
   overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
+  padding: 4px 0;
 }
 
-.topic-item {
+.topic-pill {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 8px;
-  border-radius: 6px;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
   cursor: pointer;
-  font-size: 0.875rem;
-  transition: background 0.15s;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  text-align: left;
+  color: var(--text);
+  user-select: none;
 }
-.topic-item:hover { background: #f1f5f9; }
-.topic-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+.topic-pill:hover { border-color: #94a3b8; background: #f8fafc; }
+.topic-pill:disabled { opacity: 0.5; cursor: not-allowed; }
+.topic-pill:disabled:hover { border-color: var(--border); background: var(--card); }
+.topic-pill.selected { border-color: var(--success); background: #f0fdf4; }
+
+.pill-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.topic-pill.selected .pill-radio {
+  border-color: var(--success);
+  background: var(--success);
+}
+.pill-radio::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.topic-pill.selected .pill-radio::after { opacity: 1; }
+
+.pill-label { flex: 1; }
 
 select {
   width: 100%;

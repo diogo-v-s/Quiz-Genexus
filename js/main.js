@@ -46,14 +46,12 @@ function updateQuestionCard(s) {
   const q = s.questions[s.currentIndex];
   if (!q) return;
 
-  // Update question card
   const card = document.getElementById('questionCard');
   if (card) {
     const answer = s.answers[s.currentIndex] ?? null;
     card.outerHTML = renderQuestion(q, answer);
   }
 
-  // Update nav buttons
   const nav = document.querySelector('.nav-buttons');
   if (nav) {
     const total = s.questions.length;
@@ -90,7 +88,7 @@ function handleStateChange(newState, prevState) {
   if (newState.screen !== prevState.screen) {
     navigate(newState.screen);
   } else if (newState.screen === 'quiz') {
-    if (newState.currentIndex !== prevState.currentIndex || newState.answers !== prevState.answers) {
+    if (newState.currentIndex !== prevState.currentIndex) {
       updateQuestionCard(newState);
     } else {
       updateCounter(newState);

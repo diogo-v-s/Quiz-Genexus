@@ -18,12 +18,10 @@ export function render() {
               ${s.topics.length === 0
                 ? '<p style="color:var(--muted)">Carregando topicos...</p>'
                 : s.topics.map(t => `
-                  <label class="topic-item">
-                    <input type="checkbox" value="${t}"
-                      ${s.selectedTopics.includes(t) ? 'checked' : ''}
-                      ${s.generating ? 'disabled' : ''}>
-                    <span>${t}</span>
-                  </label>
+                  <button type="button" class="topic-pill${s.selectedTopics.includes(t) ? ' selected' : ''}" data-topic="${t}" ${s.generating ? 'disabled' : ''}>
+                    <span class="pill-radio"></span>
+                    <span class="pill-label">${t}</span>
+                  </button>
                 `).join('')
               }
             </div>
@@ -53,26 +51,38 @@ export function mount() {
   const form = document.getElementById('configForm');
   const topicList = document.getElementById('topicList');
 
-  // Load topics if not already loaded
   if (getState().topics.length === 0) {
     loadTopics();
   }
 
+  const onPillClick = (e) => {
+    const pill = e.target.closest('.topic-pill');
+    if (!pill) return;
+    const topic = pill.dataset.topic;
+    const s = getState();
+    let selected = [...s.selectedTopics];
+    if (selected.includes(topic)) {
+      selected = selected.filter(t => t !== topic);
+    } else {
+      selected.push(topic);
+    }
+    pill.classList.toggle('selected');
+    setState({ selectedTopics: selected, error: null });
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
-    const checks = document.querySelectorAll('#topicList input:checked');
-    const selected = Array.from(checks).map(c => c.value);
-    const qty = parseInt(document.getElementById('qty').value);
+    const selected = Array.from(document.querySelectorAll('.topic-pill.selected')).map(p => p.dataset.topic);
 
     if (selected.length === 0) {
       setState({ error: 'Selecione pelo menos um topico.' });
       return;
     }
 
-    setState({ selectedTopics: selected, questionCount: qty, error: null, generating: true });
+    setState({ selectedTopics: selected, questionCount: parseInt(document.getElementById('qty').value), error: null, generating: true });
 
     try {
-      const data = await generateQuestions(selected, qty);
+      const data = await generateQuestions(selected, parseInt(document.getElementById('qty').value));
       if (!data.questions || data.questions.length === 0) {
         throw new Error('Nenhuma questao foi gerada. Verifique se o servidor esta rodando.');
       }
@@ -90,14 +100,12 @@ export function mount() {
     }
   };
 
-  const onChangeCheck = () => setState({ error: null });
-
+  topicList?.addEventListener('click', onPillClick);
   form?.addEventListener('submit', onSubmit);
-  topicList?.addEventListener('change', onChangeCheck);
 
   return () => {
+    topicList?.removeEventListener('click', onPillClick);
     form?.removeEventListener('submit', onSubmit);
-    topicList?.removeEventListener('change', onChangeCheck);
   };
 }
 
@@ -115,13 +123,12 @@ async function loadTopics() {
   try {
     const data = await fetchTopics();
     setState({ topics: data.topics, selectedTopics: data.topics.slice(0, 3), error: null });
-    // Update DOM directly
     if (topicList) {
       topicList.innerHTML = data.topics.map(t => `
-        <label class="topic-item">
-          <input type="checkbox" value="${t}" checked>
-          <span>${t}</span>
-        </label>
+        <button type="button" class="topic-pill selected" data-topic="${t}" ${getState().generating ? 'disabled' : ''}>
+          <span class="pill-radio"></span>
+          <span class="pill-label">${t}</span>
+        </button>
       `).join('');
     }
   } catch (err) {
