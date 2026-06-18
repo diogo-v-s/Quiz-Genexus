@@ -1,0 +1,79 @@
+# Quiz GeneXus Advanced 18
+
+Sistema de quiz interativo baseado no conteúdo do curso **GeneXus Advanced 18**, com perguntas de múltipla escolha e verdadeiro/falso sobre todos os tópicos do curso.
+
+## 🎯 Objetivo
+
+Testar e reforçar o conhecimento dos conceitos avançados do GeneXus 18 através de um quiz dinâmico, com feedback imediato e replay das questões.
+
+## 🔗 Acesso
+
+**https://diogo-v-s.github.io/quiz-genexus**
+
+## 🧠 Como funciona
+
+1. **Selecione os tópicos** que deseja estudar (Transactions, Formulas, Procedures, Business Components, etc.)
+2. **Escolha a quantidade** de questões por tópico
+3. **Responda o quiz** — selecione a opção e clique em "Continuar"
+4. **Resultado** — veja se foi **Aprovado** (≥ 60%) ou **Reprovado**
+5. **Revisão** — clique em "Visualizar Questões" para ver cada pergunta, sua resposta, a resposta correta e a explicação
+
+## 📚 Tópicos abordados
+
+- Transactions & Rules (Add, Subtract, Nullable, Subtypes)
+- Formulas (Horizontal, Inline, Aggregate, Compound)
+- Dynamic Transactions & Events
+- Procedures (For Each, Subroutines, Unique Clause)
+- Data Selector
+- Data Provider
+- Business Components (Insert, Update, Delete, Save)
+- Database Updates (New, For Each, Delete)
+- Transactional Integrity (LUW)
+- Web Panels & UI Events
+- Access to External Data (REST, SOAP, ODATA)
+
+## 🛠️ Tecnologias
+
+- **Frontend:** HTML5, CSS3, JavaScript (ES Modules)
+- **Backend (opcional):** Node.js + Express
+- **IA (opcional):** Ollama (geração automática de questões)
+- **Hospedagem:** GitHub Pages
+
+## 🚀 Rodar localmente
+
+```bash
+npm install
+npm start
+# Abre http://localhost:3000
+```
+
+Para gerar questões automaticamente via IA, instale o [Ollama](https://ollama.com) e execute:
+
+```bash
+ollama pull llama3.1:8b
+ollama serve
+```
+
+## 📁 Estrutura
+
+```
+quiz-genexus/
+├── index.html          ← Página principal
+├── css/style.css       ← Estilos
+├── js/                 ← Frontend (vanilla JS)
+│   ├── main.js         ← Roteamento e navegação
+│   ├── state.js        ← Gerenciamento de estado
+│   ├── questions.js    ← Banco de 40 questões seed
+│   ├── api.js          ← Comunicação com backend
+│   ├── screens/        ← Telas (Start, Quiz, Result)
+│   └── components/     ← Componentes (QuestionCard)
+├── server/             ← Backend opcional (Node.js)
+│   ├── index.js        ← Servidor Express
+│   ├── routes/         ← API de geração
+│   └── services/       ← Chunker, Ollama, validação
+└── content/            ← Conteúdo do curso (.txt)
+```
+
+## 📝 Sobre o conteúdo
+
+As questões foram extraídas do material oficial do curso **GeneXus Advanced 18**, ministrado pelo instrutor Daniel Strack. O sistema conta com 40 questões pré-escritas e suporte para geração ilimitada via IA (Ollama).
