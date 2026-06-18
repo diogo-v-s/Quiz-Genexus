@@ -6,20 +6,21 @@ export function render() {
   if (!s.questions.length) return '<p>Nenhuma questao disponivel.</p>';
 
   const total = s.questions.length;
-  const pct = total > 0 ? ((s.currentIndex) / total) * 100 : 0;
+  const idx = s.currentIndex;
+  const pct = total > 0 ? (idx / total) * 100 : 0;
 
   return `
-    <div class="screen ${s.screen === 'quiz' ? 'active' : ''}">
+    <div class="screen active">
       <div class="progress-bar">
         <div class="progress-fill" style="width: ${pct}%"></div>
       </div>
-      <p id="questionCounter">Questao ${s.currentIndex + 1} de ${total}</p>
-      ${renderQuestion(s.questions[s.currentIndex], s.answers[s.currentIndex] ?? null)}
+      <p id="questionCounter">Questao ${idx + 1} de ${total}</p>
+      ${renderQuestion(s.questions[idx], s.answers[idx] ?? null)}
       <div class="nav-buttons">
-        <button class="btn btn-outline" id="prevBtn" ${s.currentIndex === 0 ? 'disabled' : ''}>
+        <button class="btn btn-outline" id="prevBtn" ${idx === 0 ? 'disabled' : ''}>
           Anterior
         </button>
-        ${s.currentIndex < total - 1
+        ${idx < total - 1
           ? `<button class="btn btn-primary" id="nextBtn">Continuar</button>`
           : `<button class="btn btn-success" id="finishBtn">Finalizar Prova</button>`
         }
@@ -36,33 +37,26 @@ export function mount() {
 
     const option = e.target.closest('.option');
     if (option && content.contains(option)) {
-      const idx = parseInt(option.dataset.index);
-      selectAnswer(idx);
+      selectAnswer(parseInt(option.dataset.index));
       return;
     }
 
     if (e.target.id === 'prevBtn' || e.target.closest('#prevBtn')) {
-      if (s.currentIndex > 0) {
-        setState({ currentIndex: s.currentIndex - 1 });
-      }
+      goTo(s.currentIndex - 1);
       return;
     }
 
     if (e.target.id === 'nextBtn' || e.target.closest('#nextBtn')) {
-      const currentAnswer = s.answers[s.currentIndex];
-      if (currentAnswer === null || currentAnswer === undefined) {
+      if (s.answers[s.currentIndex] == null) {
         alert('Selecione uma resposta antes de continuar.');
         return;
       }
-      if (s.currentIndex < s.questions.length - 1) {
-        setState({ currentIndex: s.currentIndex + 1 });
-      }
+      goTo(s.currentIndex + 1);
       return;
     }
 
     if (e.target.id === 'finishBtn' || e.target.closest('#finishBtn')) {
-      const currentAnswer = s.answers[s.currentIndex];
-      if (currentAnswer === null || currentAnswer === undefined) {
+      if (s.answers[s.currentIndex] == null) {
         alert('Selecione uma resposta antes de finalizar.');
         return;
       }
@@ -91,20 +85,72 @@ function selectAnswer(selectedIndex) {
 
   setState({ answers: newAnswers });
 
-  // Direct DOM update - no re-render
-  const options = document.querySelectorAll('.option');
-  options.forEach((opt, i) => {
+  document.querySelectorAll('.option').forEach((opt, i) => {
     opt.classList.toggle('selected', i === selectedIndex);
   });
+
+  updateTopbar();
+}
+
+function goTo(newIndex) {
+  const s = getState();
+  if (newIndex < 0 || newIndex >= s.questions.length) return;
+  setState({ currentIndex: newIndex });
+  renderCurrentQuestion();
+}
+
+function renderCurrentQuestion() {
+  const s = getState();
+  const q = s.questions[s.currentIndex];
+  if (!q) return;
+
+  const card = document.getElementById('questionCard');
+  if (card) {
+    card.outerHTML = renderQuestion(q, s.answers[s.currentIndex] ?? null);
+  }
+
+  const nav = document.querySelector('.nav-buttons');
+  if (nav) {
+    const total = s.questions.length;
+    nav.innerHTML = `
+      <button class="btn btn-outline" id="prevBtn" ${s.currentIndex === 0 ? 'disabled' : ''}>
+        Anterior
+      </button>
+      ${s.currentIndex < total - 1
+        ? `<button class="btn btn-primary" id="nextBtn">Continuar</button>`
+        : `<button class="btn btn-success" id="finishBtn">Finalizar Prova</button>`
+      }
+    `;
+  }
+
+  const counter = document.getElementById('questionCounter');
+  if (counter) counter.textContent = `Questao ${s.currentIndex + 1} de ${s.questions.length}`;
+
+  const fill = document.querySelector('.progress-fill');
+  if (fill) {
+    const pct = s.questions.length > 0 ? (s.currentIndex / s.questions.length) * 100 : 0;
+    fill.style.width = `${pct}%`;
+  }
+
+  updateTopbar();
+}
+
+function updateTopbar() {
+  const s = getState();
+  const indicator = document.getElementById('progress-indicator');
+  if (!indicator) return;
+  const answered = s.answers.filter(a => a != null).length;
+  indicator.textContent = `${answered}/${s.questions.length} respondidas`;
 }
 
 function finishQuiz() {
   const s = getState();
 
   for (let i = 0; i < s.questions.length; i++) {
-    if (s.answers[i] === null || s.answers[i] === undefined) {
+    if (s.answers[i] == null) {
       alert(`Voce deixou a questao ${i + 1} sem responder.`);
       setState({ currentIndex: i });
+      renderCurrentQuestion();
       return;
     }
   }

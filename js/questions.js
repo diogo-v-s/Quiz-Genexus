@@ -347,6 +347,136 @@ export const SEED_QUESTIONS = [
     options: ["Descriptografar dados do banco", "Gerar objetos GeneXus a partir do esquema de um banco existente", "Converter codigo GeneXus para outra linguagem", "Otimizar consultas SQL"],
     correct: 1,
     explanation: "Engenharia reversa permite conectar-se a uma base de dados existente e gerar objetos GeneXus automaticamente a partir do esquema do banco."
+  },
+  {
+    type: "multiple_choice",
+    topic: "ACCESS TO EXTERNAL DATA",
+    difficulty: "hard",
+    question: "Para consumir um Web Service REST no GeneXus, qual objeto deve ser utilizado?",
+    options: ["Data Provider", "Procedure com HTTP Call", "Web Panel", "Stored Procedure"],
+    correct: 1,
+    explanation: "Para consumir REST, usa-se Procedure com HTTP Call ou o objeto REST Procedure. Para SOAP, importa-se o WSDL."
+  },
+  {
+    type: "true_false",
+    topic: "ACCESS TO EXTERNAL DATA",
+    difficulty: "easy",
+    question: "O GeneXus suporta integracao com bancos de dados NoSQL como MongoDB atraves de conectores nativos.",
+    correct: false,
+    explanation: "Falso. GeneXus tem suporte nativo a bancos SQL relacionais. Para NoSQL, e necessario usar External Objects ou APIs customizadas."
+  },
+  {
+    type: "multiple_choice",
+    topic: "TRANSACTIONS & RULES",
+    difficulty: "medium",
+    question: "Qual o efeito da regra 'NoAccept' em um atributo de transacao no GeneXus?",
+    options: ["Impede que o atributo seja exibido no formulario", "Bloqueia a aceitacao de valores nulos", "Marca o atributo como somente leitura na interface", "Remove a validacao de tipo do atributo"],
+    correct: 2,
+    explanation: "NoAccept impede que o atributo seja editado pelo usuario, tornando-o apenas para exibicao."
+  },
+  {
+    type: "multiple_choice",
+    topic: "FORMULAS",
+    difficulty: "hard",
+    question: "Em uma formula vertical de agregacao, como o GeneXus determina o nivel de agrupamento?",
+    options: ["Pela clausula Group By explicita", "Pelo contexto da formula (atributo base)", "Pela ordem alfabetica dos atributos", "Pela PK da tabela base"],
+    correct: 1,
+    explanation: "O nivel de agrupamento em formulas verticais e definido pelo contexto — o atributo base da formula determina o agrupamento."
+  },
+  {
+    type: "multiple_choice",
+    topic: "DYNAMIC TRANSACTIONS & EVENTS",
+    difficulty: "medium",
+    question: "Para que serve o evento 'Exit' em uma transacao GeneXus?",
+    options: ["Encerrar a aplicacao", "Cancelar a operacao atual e retornar ao estado anterior", "Salvar e fechar a transacao", "Exportar dados para arquivo"],
+    correct: 1,
+    explanation: "O evento Exit e acionado quando o usuario cancela ou fecha a transacao, permitindo limpar variaveis ou confirmar o cancelamento."
+  },
+  {
+    type: "true_false",
+    topic: "DYNAMIC TRANSACTIONS & EVENTS",
+    difficulty: "medium",
+    question: "Toda transacao dinamica no GeneXus requer obrigatoriamente um Data Provider para inicializar seus dados.",
+    correct: true,
+    explanation: "Dynamic Transactions usam Data Provider como fonte de dados inicial, pois nao possuem tabela propria no banco."
+  },
+  {
+    type: "multiple_choice",
+    topic: "PROCEDURES (FOR EACH, SUBROUTINES, UNIQUE)",
+    difficulty: "medium",
+    question: "Qual clausula do For each permite ordenar os registros de forma crescente?",
+    options: ["ASCEND", "ORDER ASC", "SORT BY", "ORDER BY"],
+    correct: 0,
+    explanation: "A clausula ORDER pode ser ASCEND (crescente) ou DESCEND (decrescente) no comando For each do GeneXus."
+  },
+  {
+    type: "multiple_choice",
+    topic: "DATA SELECTOR",
+    difficulty: "easy",
+    question: "Um Data Selector pode receber parametros para filtrar dados dinamicamente?",
+    options: ["Sim, atraves de parametros definidos no Data Selector", "Nao, Data Selector e estatico", "Apenas se vinculado a um For each", "Somente em versoes Enterprise"],
+    correct: 0,
+    explanation: "Data Selector aceita parametros para filtrar dados dinamicamente, permitindo reuso com diferentes criterios."
+  },
+  {
+    type: "multiple_choice",
+    topic: "DATA SELECTOR",
+    difficulty: "medium",
+    question: "Qual a diferenca entre um Data Selector e uma Query no GeneXus?",
+    options: ["Data Selector nao executa, apenas define condicoes; Query executa e retorna dados", "Query e mais rapida que Data Selector", "Data Selector so funciona em Web Panels", "Nao ha diferenca"],
+    correct: 0,
+    explanation: "Data Selector define condicoes e ordenacao para reuso, mas nao executa. Query executa e retorna um conjunto de dados."
+  },
+  {
+    type: "true_false",
+    topic: "DATA SELECTOR",
+    difficulty: "easy",
+    question: "Um Data Selector pode ser usado como fonte de dados para um Grid em um Web Panel.",
+    correct: true,
+    explanation: "Data Selector pode ser usado como fonte de dados de Grid, Formulas e em comandos For each."
+  },
+  {
+    type: "multiple_choice",
+    topic: "DATA PROVIDER",
+    difficulty: "hard",
+    question: "No Data Provider, como criar uma estrutura hierarquica aninhada (pai-filho)?",
+    options: ["Usando atributos com o mesmo nome", "Definindo nos filhos dentro do no pai no XML de saida", "Criando SDTs separados e vinculando", "Nao e possivel criar hierarquia em Data Provider"],
+    correct: 1,
+    explanation: "A hierarquia e definida pela indentacao dos nos no XML de saida — nos filhos sao definidos dentro do no pai."
+  },
+  {
+    type: "true_false",
+    topic: "DATA PROVIDER",
+    difficulty: "medium",
+    question: "O Data Provider pode transformar dados de multiplas fontes em uma unica estrutura de saida.",
+    correct: true,
+    explanation: "Data Provider suporta multiplas fontes de entrada e as transforma em uma unica estrutura hierarquica de saida (SDT, XML, JSON)."
+  },
+  {
+    type: "multiple_choice",
+    topic: "DATABASE UPDATES (NEW, FOR EACH, DELETE)",
+    difficulty: "hard",
+    question: "O que acontece se um comando New tentar inserir um registro com chave primaria ja existente?",
+    options: ["O registro e atualizado automaticamente", "O comando When duplicate e executado", "Um erro de banco e lancado e o programa para", "O registro e ignorado silenciosamente"],
+    correct: 1,
+    explanation: "When duplicate captura a tentativa de inserir chave duplicada e executa o bloco definido, permitindo tratar a situacao."
+  },
+  {
+    type: "multiple_choice",
+    topic: "TRANSACTIONAL INTEGRITY (LUW)",
+    difficulty: "medium",
+    question: "O que ocorre quando um erro de banco acontece dentro de uma LUW no GeneXus?",
+    options: ["Apenas a operacao com erro e desfeita", "Toda a LUW e desfeita (rollback)", "O programa continua ignorando o erro", "Um commit parcial e executado"],
+    correct: 1,
+    explanation: "Em caso de erro dentro de uma LUW, todo o conjunto de operacoes e desfeito (rollback) para manter a integridade."
+  },
+  {
+    type: "true_false",
+    topic: "TRANSACTIONAL INTEGRITY (LUW)",
+    difficulty: "easy",
+    question: "O comando Commit no GeneXus persiste todas as operacoes da LUW atual no banco de dados.",
+    correct: true,
+    explanation: "Commit finaliza a LUW atual e persiste todas as operacoes realizadas dentro dela no banco de dados."
   }
 ];
 

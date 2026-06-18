@@ -13,6 +13,8 @@ let state = {
   loading: false,
   error: null,
   generating: false,
+  apiKey: '',
+  aiEnabled: false,
 };
 
 let onChange = null;
@@ -62,6 +64,8 @@ function save() {
       result: state.result,
       selectedTopics: state.selectedTopics,
       questionCount: state.questionCount,
+      apiKey: state.apiKey,
+      aiEnabled: state.aiEnabled,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   } catch {}

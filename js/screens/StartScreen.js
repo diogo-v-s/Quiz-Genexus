@@ -35,6 +35,16 @@ export function render() {
               <option value="5" ${s.questionCount === 5 ? 'selected' : ''}>5 questoes</option>
             </select>
           </div>
+          <div class="ai-section">
+            <label class="ai-toggle">
+              <input type="checkbox" id="aiToggle" ${s.aiEnabled ? 'checked' : ''}>
+              <span>Usar IA para gerar questoes</span>
+            </label>
+            <div class="ai-key-input" id="aiKeyWrap" style="${s.aiEnabled ? '' : 'display:none'}">
+              <input type="password" id="apiKeyInput" class="input" placeholder="Chave da API OpenRouter (sk-or-...)" value="${s.apiKey}">
+              <a href="https://openrouter.ai/keys" target="_blank" class="ai-help">Obter chave gratuita</a>
+            </div>
+          </div>
           <button type="submit" class="btn btn-primary" id="startBtn" ${s.generating ? 'disabled' : ''}>
             ${s.generating
               ? '<span class="spinner-ring" style="width:20px;height:20px;border-width:3px"></span> Gerando questoes...'
@@ -72,7 +82,9 @@ export function mount() {
       return;
     }
 
-    setState({ selectedTopics: selected, questionCount: parseInt(document.getElementById('qty').value), error: null, generating: true });
+    const aiEnabled = document.getElementById('aiToggle').checked;
+    const apiKey = document.getElementById('apiKeyInput').value;
+    setState({ selectedTopics: selected, questionCount: parseInt(document.getElementById('qty').value), apiKey, aiEnabled, error: null, generating: true });
 
     try {
       const data = await generateQuestions(selected, parseInt(document.getElementById('qty').value));
@@ -93,10 +105,28 @@ export function mount() {
     }
   };
 
+  const aiToggle = document.getElementById('aiToggle');
+  const apiKeyInput = document.getElementById('apiKeyInput');
+  const aiKeyWrap = document.getElementById('aiKeyWrap');
+
+  const onAiToggle = () => {
+    const enabled = aiToggle.checked;
+    aiKeyWrap.style.display = enabled ? '' : 'none';
+    setState({ aiEnabled: enabled, error: null });
+  };
+
+  const onApiKeyInput = () => {
+    setState({ apiKey: apiKeyInput.value, error: null });
+  };
+
+  aiToggle?.addEventListener('change', onAiToggle);
+  apiKeyInput?.addEventListener('input', onApiKeyInput);
   topicList?.addEventListener('click', onPillClick);
   form?.addEventListener('submit', onSubmit);
 
   return () => {
+    aiToggle?.removeEventListener('change', onAiToggle);
+    apiKeyInput?.removeEventListener('input', onApiKeyInput);
     topicList?.removeEventListener('click', onPillClick);
     form?.removeEventListener('submit', onSubmit);
   };

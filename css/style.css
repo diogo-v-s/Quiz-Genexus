@@ -411,6 +411,48 @@ select {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* AI Section */
+.ai-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.ai-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  user-select: none;
+}
+.ai-toggle input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+
+.ai-key-input {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: monospace;
+  background: white;
+}
+.input:focus { outline: none; border-color: var(--primary); }
+
+.ai-help {
+  font-size: 0.8rem;
+  color: var(--primary);
+  text-decoration: underline;
+}
+
 .error-msg {
   background: #fef2f2;
   border: 1px solid #fecaca;
