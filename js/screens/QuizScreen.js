@@ -66,7 +66,10 @@ export function mount() {
   };
 
   document.addEventListener('click', handler);
-  return () => document.removeEventListener('click', handler);
+
+  return () => {
+    document.removeEventListener('click', handler);
+  };
 }
 
 function selectAnswer(selectedIndex) {
@@ -96,42 +99,8 @@ function goTo(newIndex) {
   const s = getState();
   if (newIndex < 0 || newIndex >= s.questions.length) return;
   setState({ currentIndex: newIndex });
-  renderCurrentQuestion();
-}
-
-function renderCurrentQuestion() {
-  const s = getState();
-  const q = s.questions[s.currentIndex];
-  if (!q) return;
-
-  const card = document.getElementById('questionCard');
-  if (card) {
-    card.outerHTML = renderQuestion(q, s.answers[s.currentIndex] ?? null);
-  }
-
-  const nav = document.querySelector('.nav-buttons');
-  if (nav) {
-    const total = s.questions.length;
-    nav.innerHTML = `
-      <button class="btn btn-outline" id="prevBtn" ${s.currentIndex === 0 ? 'disabled' : ''}>
-        Anterior
-      </button>
-      ${s.currentIndex < total - 1
-        ? `<button class="btn btn-primary" id="nextBtn">Continuar</button>`
-        : `<button class="btn btn-success" id="finishBtn">Finalizar Prova</button>`
-      }
-    `;
-  }
-
-  const counter = document.getElementById('questionCounter');
-  if (counter) counter.textContent = `Questao ${s.currentIndex + 1} de ${s.questions.length}`;
-
-  const fill = document.querySelector('.progress-fill');
-  if (fill) {
-    const pct = s.questions.length > 0 ? (s.currentIndex / s.questions.length) * 100 : 0;
-    fill.style.width = `${pct}%`;
-  }
-
+  const content = document.getElementById('content');
+  if (content) content.innerHTML = render();
   updateTopbar();
 }
 
@@ -149,7 +118,9 @@ function finishQuiz() {
     if (s.answers[i] == null) {
       alert(`Voce deixou a questao ${i + 1} sem responder.`);
       setState({ currentIndex: i });
-      renderCurrentQuestion();
+      const content = document.getElementById('content');
+      if (content) content.innerHTML = render();
+      updateTopbar();
       return;
     }
   }
