@@ -1,11 +1,12 @@
 import { getTopicList, getQuestionsForTopics } from './questions.js';
 
-const BACKEND_URL = window.location.origin;
+const isGitHubPages = window.location.hostname.includes('github.io');
 
 async function tryBackend(path, options = {}) {
+  if (isGitHubPages) return null;
   try {
-    const res = await fetch(`${BACKEND_URL}${path}`, {
-      signal: AbortSignal.timeout(2000),
+    const res = await fetch(`${window.location.origin}${path}`, {
+      signal: AbortSignal.timeout(1500),
       ...options,
       headers: { 'Content-Type': 'application/json', ...options.headers }
     });
@@ -25,7 +26,6 @@ export async function fetchTopics() {
 }
 
 export async function generateQuestions(topics, count = 3) {
-  // Try backend first (for AI-generated questions via Ollama)
   const data = await tryBackend('/api/generate', {
     method: 'POST',
     body: JSON.stringify({ topics, count })
@@ -35,7 +35,6 @@ export async function generateQuestions(topics, count = 3) {
     return data;
   }
 
-  // Fallback to local seed questions
   const questions = getQuestionsForTopics(topics, count);
   return { questions, fallback: true };
 }

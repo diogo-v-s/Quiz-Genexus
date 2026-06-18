@@ -5,7 +5,7 @@ echo ============================================
 echo.
 echo 1. Crie um repositorio no GitHub:
 echo    https://github.com/new
-echo    Nome: quiz-genexus
+echo    Nome: Quiz-Genexus
 echo.
 echo 2. Execute no terminal:
 echo.
@@ -13,7 +13,7 @@ echo    cd C:\KBs\Quiz-Estudos\quiz-genexus
 echo    git init
 echo    git add .
 echo    git commit -m "Initial commit"
-echo    git remote add origin https://github.com/diogo-v-s/quiz-genexus.git
+echo    git remote add origin https://github.com/diogo-v-s/Quiz-Genexus.git
 echo    git push -u origin main
 echo.
 echo 3. No GitHub, va em:
@@ -22,7 +22,7 @@ echo    Branch: main, Folder: / (root)
 echo    Clique em Salvar
 echo.
 echo 4. Pronto! Acesse:
-echo    https://diogo-v-s.github.io/quiz-genexus
+echo    https://diogo-v-s.github.io/Quiz-Genexus
 echo.
 echo ============================================
 echo  Para rodar LOCALMENTE:
