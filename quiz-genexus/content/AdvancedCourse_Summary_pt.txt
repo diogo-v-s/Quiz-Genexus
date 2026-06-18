@@ -1,0 +1,278 @@
+GeneXus Advanced 18 - Resumo Conceitual
+
+1. TRANSACTIONS & RULES
+
+Transactions sao objetos principais no GeneXus que representam entidades do negocio. Possuem regras (Rules) que sao comandos declarativos executados automaticamente.
+
+Rules:
+- Add(attribute1, attribute2) If condition: Soma valores. Se o registro ja existe, adiciona o novo valor ao existente. Se nao existe, insere o valor normalmente.
+  Comportamento: Se o registro existe na base, ADD soma (+). Se nao existe, ADD insere (=). A diferenca (diff) e o valor adicionado ao existente.
+- Subtract(attribute1, attribute2) If condition: Subtrai valores. Se o registro existe, subtrai (-). Se nao existe, insere com valor negativo (=). A diferenca (diff) e o valor subtraido.
+
+Client Side Validation: Validacoes executadas no lado do cliente antes de enviar ao servidor. Melhora a experiencia do usuario evitando viagens ao servidor desnecessarias.
+
+Nullable property: Propriedade que indica se um atributo pode aceitar valores nulos no banco de dados. Quando um atributo e nullable e o campo fica vazio no formulario, o valor enviado ao banco e NULL, nao vazio.
+
+Subtypes: Permitem criar subtipos de atributos, herdando propriedades e permitindo especializacao.
+
+2. FORMULAS
+
+Horizontal formulas: Atributo = expressao1 if condicao1; expressao2 if condicao2; ... expressaoN otherwise;
+- Expressoes podem usar: Atributos da tabela estendida, constantes, variaveis predefinidas, funcoes, operadores (aritmeticos, strings, datas), invocacao a procedimento que retorne valor.
+- Condicoes podem usar: Atributos, constantes, funcoes, operadores logicos (OR, AND, NOT) e relacionais (>, >=, <, <=, =, <>, like).
+
+Inline formulas: Usam o contexto da tabela base para calcular valores. Exemplo: em FLIGHTINSTANCE, pode-se usar contexto da tabela estendida de FLIGHTINSTANCE ou de FLIGHT.
+
+Aggregate formulas: Count, Sum, Average, Max, Min, Find.
+- Syntax: AggregateFormula(Expression, Condition, DefaultValue, ReturnedValue) if TriggeringCondition
+- Todos os parametros sao opcionais exceto a expressao.
+- Nao precisam de contexto, mas se houver, pode-se filtrar o resultado.
+- Exemplo: Count(Atributo, condicao, Valor padrao) condicao; Sum(Expressao, condicao, Valor padrao) if condicao; Find(Expressao, condicao, Valor padrao) if condicao;
+
+Compound formulas: Combinam diferentes tipos de formula em uma unica expressao.
+- Atributo = expressao1 if condicao1; expressao2 if condicao2; ... expressaoN otherwise;
+- Podem misturar: Count, Sum, Max, Min, Find, expressoes aritmeticas, invocacao a procedimentos.
+- Exemplo: Atributo = Max(...) if condicao1; (2 * atrx) + 100 if condicao2; Sum(atry) otherwise
+
+3. DYNAMIC TRANSACTIONS & EVENTS
+
+Dynamic Transactions: Transacoes que nao possuem tabela associada na base de dados. Usam Data Provider (DP) para inicializar e receber dados. Permitem inserir, atualizar e deletar registros em tabelas de forma programatica.
+
+Cenario de uso tipico: relacionamento de integridade do tipo "or" (ou uma tabela ou outra). A Dynamic Transaction permite tratar este cenario sem criar uma tabela fisica, usando DP para inicializar com dados default e DP para receber os dados submetidos.
+
+Database update: Dynamic Transactions suportam Insert, Update e Delete diretamente via codigo no evento correspondente.
+
+Events in Transactions:
+- Start: Executado quando a transacao abre e comeca a trabalhar. Usado para inicializar variaveis ou valores default.
+- Track Context: Permite programar acao quando ha alteracao no contexto de execucao da transacao.
+- OnMessage: Relacionado a notificacoes web. Dispara quando uma mensagem e recebida.
+- Insert, Update, Delete: Aplicam-se apenas ao uso de transacoes dinamicas. Cada evento e disparado conforme a operacao realizada.
+- Exit: Acoes executadas quando a transacao e fechada. Usado para limpeza ou validacoes finais.
+- After Trn: Disparado apos execucao do Commit. Executa no mesmo momento que AfterComplete. Diferenca: After Trn e evento da transacao, AfterComplete e do objeto.
+
+Analysis Transaction Design Model: Diferentes opcoes de design para entidades como Loan (emprestimo):
+- Option 2: Three transactions (entidade dividida em 3 transacoes)
+- Option 3: Two transactions (entidade dividida em 2 transacoes)
+- Option 4: Three simple transactions (3 transacoes simples, sem complexidade)
+
+4. PROCEDURES (FOR EACH, SUBROUTINES, UNIQUE)
+
+For each: Estrutura de navegacao em tabelas da base de dados.
+- Base table: Obrigatorio especificar a tabela base via PK.
+- Clauses: Order, Where, When, When None.
+- Nested For each: Pode-se ter um For each dentro de outro. Comportamento depende da relacao entre as tabelas base (1:N direta, indireta, mesma tabela com agrupamento, ou sem relacao - JOIN).
+- Control Break: Ocorre quando mesmo For each + criterio de agrupamento.
+
+When / When None: Clausulas condicionais no For each. When none executa quando nenhum registro atende a condicao.
+
+Subroutine:
+- Bloco de codigo definido com SUB e invocado com DO.
+- Podem ser usadas em: Web Panels, Procedures, Panels e Transactions.
+- Atributos e variaveis sao globais para o objeto.
+- Nao suportam passagem de parametros (usam variaveis globais).
+- Se chamada dentro de um For each e a sub-rotina tambem tem For each, eles nao serao aninhados.
+
+Unique Clause:
+- Usado em listas sem elementos repetidos.
+- Permite uniao de informacao com formulas inline.
+- Usado em Data Provider e Grid em Web Panel.
+- Restricoes: nao suportado para cortes de controle.
+
+5. DATA SELECTOR
+
+Data Selector: Objeto que armazena um conjunto de parametros, condicoes e ordens para reutilizar navegacao em diferentes consultas e calculos. Permite definir uma vez e reutilizar em varios objetos da KB.
+
+Quando ha condicoes e ordens que devem ser aplicadas a varios objetos da KB, o Data Selector centraliza a logica, simplificando codigo, reduzindo duplicacao e diminuindo esforcos de manutencao diante de mudancas futuras. Se uma condicao precisar ser alterada, muda-se apenas no Data Selector e todos os objetos que o utilizam sao atualizados automaticamente.
+
+Pode ser usado em:
+- For each: Aplica as condicoes e ordens definidas no Data Selector a navegacao.
+- Formulas: Usa o Data Selector para calcular valores agregados com filtros pre-definidos.
+- Propriedade Data Selector de Grid com tabela Base: O grid herda as condicoes e ordens do Data Selector.
+- Com clausula USING: Insere as condicoes no where e a clausula Order definidas no Data Selector.
+- Com operador IN: Executa uma consulta independente, portanto tera sua propria navegacao separada do contexto externo.
+
+Exemplos de uso: Filtrar apenas registros ativos, ordenar por data descendente, aplicar restricoes de segurança (cada usuario ve apenas seus proprios registros).
+
+6. DATA PROVIDER
+
+Data Provider e um objeto GeneXus para transformacao de dados. Estrutura: INPUT -> Transformacao -> OUTPUT (formato hierarquico).
+
+INPUT pode ser:
+- Database data via For each (navegacao na base de dados)
+- Database data via SDT/BC (estruturas de dados)
+- Nenhum (geracao estatica de dados)
+
+OUTPUT: Estrutura hierarquica definida como SDT (Structured Data Type) ou BC (Business Component)
+- Formatos de saida: Txt, Html, Xml, Json, SDT, BC
+- Propriedade Collection: True (lista de registros) ou False (unico registro)
+
+Data Provider language:
+- Group of groups: Estrutura hierarquica com grupos dentro de grupos.
+- Group of elements (nao repetitivo): Elemento unico dentro do grupo.
+- Group of elements (repetitivo): Lista de elementos que se repetem (equivalent to For each).
+
+Use cases:
+- Carregar SDT a partir de informacao da Base de Dados: Preencher um SDT com dados de uma ou mais tabelas.
+- Carregar SDT de forma estatica ou preencher dados na tabela associada: Definir dados fixos no proprio Data Provider.
+- Misto (parte da BD, parte estatico): Combinar dados do banco com dados fixos.
+- Consumir dados de um servico e nao armazena-los em BD: Transformar dados de um web service sem persistir.
+
+Data Base Update via Data Provider: O metodo Save() pode ser usado para persistir dados do Data Provider diretamente no banco.
+
+7. BUSINESS COMPONENTS
+
+BC (Business Component): Objeto que encapsula uma transacao GeneXus para operacoes de banco de dados com validacao completa.
+
+Mode: Enum que indica o modo de execucao
+- Insert = 'INS'
+- Update = 'UPD'
+- Delete = 'DLT'
+- Display = 'DSP'
+
+Metodos principais:
+- &bc = new() - Cria nova instancia em modo Insert
+- &bc.Insert() - Insere no banco. Retorna boolean.
+- &bc.Load(id) - Carrega registro existente
+- &bc.Update() - Atualiza registro. Retorna boolean.
+- &bc.Delete() - Deleta registro. Retorna boolean.
+- &bc.Save() - Executa Insert ou Update automaticamente baseado no modo
+- &bc.Success() - Verifica se ultima operacao foi bem sucedida
+- &bc.InsertOrUpdate() - Tenta insert, se DuplicatePrimaryKey faz update
+
+Two-level BC: BC com nivel mestre-detalhe. Exemplo: CityTour com linhas de atracoes.
+
+GetByKey() e RemoveByKey(): Metodos de nivel para acessar/remover linhas por chave.
+- &BC.Line.GetByKey(LineId) - Retorna o BC da linha
+- &BC.Line.RemoveByKey(LineId) - Remove a linha. Retorna boolean.
+
+Metodos para colecao de BCs: InsertOrUpdate() pode ser chamado em colecoes.
+- &cityTours = GetCityTours(...) - Data Provider Source
+- If &cityTours.InsertOrUpdate() then Commit
+
+8. DATABASE UPDATES (NEW, FOR EACH, DELETE)
+
+New Command:
+- Utilizado para inserir registro em uma tabela.
+- A tabela e determinada pelos atributos atribuidos.
+- Executado no nivel de tabela.
+- Ignora regras e eventos definidos na transacao.
+- Conta apenas com controle de duplicados (When duplicate).
+- NAO tem controle de integridade referencial.
+- New dentro de For each: contexto determina valores para atributos nao atribuidos explicitamente (dependem do contexto do For each).
+
+Update via For each:
+- Nao existe comando especial para update.
+- Atualiza atributos da tabela base e sua estendida, com excecao da PK.
+- Controle de duplicados: When duplicate.
+- Nao realiza verificacoes de integridade referencial.
+- Nao executa regras ou eventos definidos na transacao.
+- Exemplo: For each Attraction where AttractionName = "Eiffel Tower" CategoryId = 3; CountryName = "Francia"; endfor
+
+Delete dentro de For each:
+- Comando Delete dentro de um For each.
+- Nao sao realizadas verificacoes de integridade referencial.
+- Nao executa regras ou eventos definidos na transacao.
+- Delete remove o registro da tabela base do For each, nao da estendida.
+- Exemplo: For each Attraction where AttractionName = "Eiffel Tower" Delete endfor
+
+Business Component VS Procedure:
+- BC: Check uniqueness, Check referential integrity, Rules/Events execution, Any Object scope
+- New/For each/Delete: Check uniqueness apenas, Procedure only scope
+
+Null FK update:
+- Com BC: Opcoes para tratar atribuicao de FK null (vazio no form = null no banco)
+- Com Procedure: Tambem possivel, mas sem as validacoes do BC
+
+9. TRANSACTIONAL INTEGRITY (LUW)
+
+LUW (Logical Unit of Work) / UTL (Unidade de Trabalho Logica): Conjunto de operacoes que devem ser executadas atomicamente.
+
+Tipos de LUW no GeneXus:
+- Implicito: No final de cada instancia, imediatamente antes do AfterComplete. Ou no final do Source.
+- Explicito: Commit escrito manualmente pelo desenvolvedor.
+
+Customizando LUWs:
+- BeforeComplete evento: Executa antes do commit.
+- AfterComplete evento: Executa apos o commit.
+- Procedimento com BeforeComplete: Procedure(parm1, parmN) on BeforeComplete;
+- Procedimento com AfterComplete: Procedure(parm1, parmN) on AfterComplete;
+
+Consideracoes:
+- Commit automatico (implicito) em procedimentos so ocorre se GeneXus interpretar necessario (se tem update, delete ou insert).
+- Business Components nao fazem commit implicito.
+- Tamanho das LUW pode ser customizado alterando a propriedade Commit on Exit e usando commit explicito.
+- Dois objetos transacao nao podem estar em uma unica LUW, a menos que sejam Business Components ou transacoes Dinamicas.
+
+10. WEB PANELS & UI EVENTS
+
+Pattern Work With for Web: Padrao para criacao de telas de listagem, visualizacao e manutencao de dados.
+
+Web Panels:
+- Sem Tabela Base: Painel sem associacao direta a tabela. Dados carregados via codigo.
+- Com Tabela Base: Painel associado a uma tabela. Atributos disponiveis diretamente.
+- Com Grid: Grade associada a tabela base para listagem de registros.
+- Varios Grids: Podem ser paralelos (independentes) ou aninhados (hierarquicos).
+
+Web Panel com varios Grids:
+- Paralelos: Cada grid com sua propria tabela base e navegacao independente.
+- Aninhados: Grid dentro de outro. Suportam relacao mestre-detalhe.
+- Comandos: Grid.Refresh(), Grid.Load()
+- Consideracoes: Control Break nao pode ser implementado entre grids aninhados.
+- Automatic refresh: Propriedade para controlar atualizacao automatica.
+
+Multiple selection em Grids:
+- AllowSelection = true + variavel booleana no grid: percorre linhas com For each line.
+- Enable Multiple Selection = true: percorre linhas com For each selected line.
+- ToJson() / FromJson(): Serializar/deserializar conteudo para JSON.
+
+Global Events: Default external object para definir eventos globais a todos componentes da aplicacao.
+1. Definicao do evento global no objeto Global Events.
+2. Objeto que invoca.
+3. Objeto que executa.
+
+Panels (Smart Devices): Web Screen CFFocus (customer-facing).
+- Thin client vs Smart client: Ambos tem logica de negocio no servidor, mas smart client oferece melhor UX.
+- Back-office: Web Panels tradicionais.
+- Front-end Web/Mobile: Panels com foco em experiencia do usuario.
+
+Eventos Client-side:
+- System Events: ClientStart, Back
+- User Events: Definidos pelo usuario
+- Control Events: Predefinidos para cada controle
+- Chamam servicos para acessar recursos do servidor.
+- Nao disparam Server Side Events (a menos que Refresh seja usado).
+- Grammar diferente do server-side.
+
+Eventos Server-side:
+- Start: Executado uma vez apenas.
+- Refresh: Executado apos Start. Dispara Load.
+- Load: Ultimo dos eventos de sistema executados (apenas se grid existe).
+  * Grid com Base Table: Load executa para cada registro.
+  * Grid sem Base Table: Load executa uma vez.
+  * SDT-based Grids: Load nao e disparado.
+
+Composite command: Apenas para Client Side Events com mais de 1 linha. Para execucao em erro. Tratamento automatico de erros.
+
+Ordem de execucao:
+1. ClientStart
+2. Call to Start & Refresh Data Provider
+3. Start event
+4. Refresh event
+5. Fixed Part is Drawn
+6. Call to Grid Data Provider
+7. Load event
+8. Grid Part is Drawn
+
+Base tables do Fixed Part e Grid: Determinadas pelos atributos usados em cada parte.
+
+11. ACCESS TO EXTERNAL DATA
+
+O GeneXus permite acessar dados externos de diversas formas para integracao com outros sistemas:
+
+Tipos de acesso a dados externos:
+- Obtencao de dados via Web Service: Consumir servicos web nos formatos XML ou JSON atraves dos protocolos REST (representational state transfer, arquitetura leve baseada em HTTP) ou SOAP (Simple Object Access Protocol, protocolo mais estruturado com WSDL).
+- Acesso a base de dados remota com protocolo ODATA: ODATA e um protocolo RESTful padrao OASIS para acesso e consulta a dados. Permite realizar CRUD em bases remotas usando consultas padronizadas como $filter, $orderby, $top, $expand.
+- Acesso a base de dados de sistema legacy: Conectar-se a bancos de dados de sistemas legados existentes na organizacao sem necessidade de migracao.
+- Uso de engenharia reversa: Conectar-se a uma base de dados existente e gerar objetos GeneXus automaticamente a partir do esquema do banco.
+
+Estes recursos permitem que aplicacoes GeneXus atuem como consumidores de servicos externos ou como provedores, integrando-se com ecossistemas heterogeneos.
