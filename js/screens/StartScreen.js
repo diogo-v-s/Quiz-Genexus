@@ -76,8 +76,10 @@ export function mount() {
     } else {
       selected.push(topic);
     }
-    pill.classList.toggle('selected');
     setState({ selectedTopics: selected, error: null });
+    document.querySelectorAll('.topic-pill').forEach(p => {
+      p.classList.toggle('selected', selected.includes(p.dataset.topic));
+    });
   };
 
   const onSubmit = async (e) => {

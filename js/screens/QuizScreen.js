@@ -60,7 +60,7 @@ export function mount() {
         alert('Selecione uma resposta antes de finalizar.');
         return;
       }
-      finishQuiz();
+      try { finishQuiz(); } catch (e) { alert('Erro: ' + e.message); }
       return;
     }
   };
@@ -145,7 +145,6 @@ function updateTopbar() {
 
 function finishQuiz() {
   const s = getState();
-
   for (let i = 0; i < s.questions.length; i++) {
     if (s.answers[i] == null) {
       alert(`Voce deixou a questao ${i + 1} sem responder.`);
@@ -168,9 +167,6 @@ function finishQuiz() {
     if (s.answers[i]?.isCorrect) byTopic[t].correct++;
   }
 
-  setState({
-    completed: true,
-    result: { total, correct, score, byTopic },
-    screen: 'result',
-  });
+  setState({ completed: true, result: { total, correct, score, byTopic } });
+  setState({ screen: 'result' });
 }
